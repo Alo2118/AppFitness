@@ -17,4 +17,7 @@ interface RewardDao {
 
     @Query("SELECT * FROM reward_entries ORDER BY timestamp DESC LIMIT :limit")
     fun observeRecent(limit: Int): Flow<List<RewardEntry>>
+
+    @Query("SELECT * FROM reward_entries ORDER BY timestamp DESC")
+    fun observeAll(): Flow<List<RewardEntry>>
 }

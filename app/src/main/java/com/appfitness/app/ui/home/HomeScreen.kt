@@ -39,6 +39,7 @@ fun HomeScreen(
     onStartWorkout: (Long) -> Unit,
     onOpenSession: (Long) -> Unit,
     onOpenGps: () -> Unit,
+    onOpenAchievements: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
@@ -103,7 +104,7 @@ fun HomeScreen(
             }
 
             item {
-                ProgressCard(totalPoints)
+                ProgressCard(totalPoints, onClick = onOpenAchievements)
             }
 
             item {
@@ -183,12 +184,13 @@ private fun GenerateCard(onClick: () -> Unit) {
 }
 
 @Composable
-private fun ProgressCard(totalPoints: Int) {
+private fun ProgressCard(totalPoints: Int, onClick: () -> Unit) {
     val level = com.appfitness.app.domain.RewardLevels.levelFor(totalPoints)
     val progress = com.appfitness.app.domain.RewardLevels.levelProgress(totalPoints)
     val toNext = com.appfitness.app.domain.RewardLevels.pointsToNextLevel(totalPoints)
     Card(
         modifier = Modifier.fillMaxWidth(),
+        onClick = onClick,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

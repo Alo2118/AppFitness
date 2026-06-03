@@ -26,6 +26,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.appfitness.app.ui.achievements.AchievementsScreen
 import com.appfitness.app.ui.exercises.ExerciseListScreen
 import com.appfitness.app.ui.history.HistoryScreen
 import com.appfitness.app.ui.home.HomeScreen
@@ -112,7 +113,11 @@ fun AppFitnessApp() {
                     },
                     onOpenSession = { /* history detail lives in the History tab */ },
                     onOpenGps = { navController.navigate(Routes.GPS) },
+                    onOpenAchievements = { navController.navigate(Routes.ACHIEVEMENTS) },
                 )
+            }
+            composable(Routes.ACHIEVEMENTS) {
+                AchievementsScreen(onBack = { navController.popBackStack() })
             }
             composable(TopDestination.PROGRAMS.route) {
                 ProgramsScreen(

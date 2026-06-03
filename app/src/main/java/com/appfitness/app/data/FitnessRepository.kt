@@ -4,10 +4,12 @@ import com.appfitness.app.data.dao.AssessmentDao
 import com.appfitness.app.data.dao.CardioAssessmentDao
 import com.appfitness.app.data.dao.ExerciseDao
 import com.appfitness.app.data.dao.GpsDao
+import com.appfitness.app.data.dao.AchievementDao
 import com.appfitness.app.data.dao.MoodDao
 import com.appfitness.app.data.dao.ProgramDao
 import com.appfitness.app.data.dao.RewardDao
 import com.appfitness.app.data.dao.WorkoutDao
+import com.appfitness.app.data.entity.AchievementUnlock
 import com.appfitness.app.data.entity.AssessmentResult
 import com.appfitness.app.data.entity.CardioAssessment
 import com.appfitness.app.data.entity.Exercise
@@ -24,10 +26,14 @@ import com.appfitness.app.data.relation.ActivityWithPoints
 import com.appfitness.app.data.relation.SessionWithSets
 import com.appfitness.app.domain.AdaptiveEngine
 import com.appfitness.app.domain.AssessmentEvaluator
+import com.appfitness.app.domain.AchievementEvaluator
 import com.appfitness.app.domain.GeneratedExercise
 import com.appfitness.app.domain.HrFitnessEvaluator
 import com.appfitness.app.domain.RewardEvent
+import com.appfitness.app.domain.RewardTier
 import com.appfitness.app.domain.SportProgramGenerator
+import com.appfitness.app.domain.StreakCalculator
+import com.appfitness.app.domain.UserStats
 import com.appfitness.app.reward.RewardCenter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -45,6 +51,7 @@ class FitnessRepository(
     private val cardioAssessmentDao: CardioAssessmentDao,
     private val gpsDao: GpsDao,
     private val rewardDao: RewardDao,
+    private val achievementDao: AchievementDao,
 ) {
     // ----- Exercises -----
     val exercises: Flow<List<Exercise>> = exerciseDao.observeAll()
@@ -112,12 +119,19 @@ class FitnessRepository(
     suspend fun updateSet(set: SetLog) = workoutDao.updateSet(set)
     suspend fun deleteSet(id: Long) = workoutDao.deleteSet(id)
 
-    // ----- Rewards (app-wide gamification) -----
+    // ----- Rewards & achievements (app-wide gamification) -----
     val totalRewardPoints: Flow<Int> = rewardDao.observeTotalPoints()
     fun recentRewards(limit: Int): Flow<List<RewardEntry>> = rewardDao.observeRecent(limit)
+    val allRewards: Flow<List<RewardEntry>> = rewardDao.observeAll()
+    val unlockedAchievements: Flow<List<String>> = achievementDao.observeUnlockedKeys()
 
-    /** Persists a reward and broadcasts it for the celebratory UI + haptics. */
+    /** Persists a reward, celebrates it, then checks for newly unlocked badges. */
     suspend fun addReward(source: String, event: RewardEvent) {
+        grantInternal(source, event)
+        evaluateAchievements()
+    }
+
+    private suspend fun grantInternal(source: String, event: RewardEvent) {
         rewardDao.insert(
             RewardEntry(
                 timestamp = System.currentTimeMillis(),
@@ -127,6 +141,37 @@ class FitnessRepository(
             )
         )
         RewardCenter.award(event)
+    }
+
+    /** Computes current stats and unlocks any achievement whose condition is met. */
+    private suspend fun evaluateAchievements() {
+        val stats = currentStats()
+        val already = achievementDao.unlockedKeys().toSet()
+        AchievementEvaluator.newlyUnlocked(stats, already).forEach { achievement ->
+            val inserted = achievementDao.insert(
+                AchievementUnlock(achievement.key, System.currentTimeMillis())
+            )
+            if (inserted != -1L) {
+                grantInternal(
+                    "achievement",
+                    RewardEvent("Traguardo sbloccato: ${achievement.title} ${achievement.emoji}", achievement.points, RewardTier.EPIC),
+                )
+            }
+        }
+    }
+
+    private suspend fun currentStats(): UserStats {
+        val points = rewardDao.observeTotalPoints().first()
+        val workouts = workoutDao.observeCompletedSessions().first().size
+        val gps = gpsDao.observeActivities().first()
+        val totalKm = gps.sumOf { it.distanceM.toDouble() } / 1000.0
+        val longestKm = (gps.maxOfOrNull { it.distanceM } ?: 0f) / 1000.0
+        val timestamps = rewardDao.observeAll().first().map { it.timestamp }
+        val streak = StreakCalculator.currentStreak(
+            StreakCalculator.activeDaysFromMillis(timestamps),
+            java.time.LocalDate.now(),
+        )
+        return UserStats(points, workouts, totalKm, longestKm, streak)
     }
 
     // ----- Mood -----

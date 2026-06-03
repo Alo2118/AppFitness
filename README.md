@@ -64,6 +64,10 @@ del benessere olistico ma con un'esecuzione semplice e offline-first.
   assegna **punti** in un sistema condiviso e persistente. Ovunque guadagni punti
   appare una **celebrazione (snackbar + vibrazione)**; la Home mostra **livello,
   punti totali e progressi** verso il livello successivo.
+- **Traguardi**: schermata dedicata con **streak giornaliera** 🔥, **obiettivi
+  settimanali** (allenamenti, km, punti) con barre di avanzamento e **badge
+  sbloccabili** (distanza, costanza, punti, serie) che si sbloccano automaticamente
+  al raggiungimento delle condizioni, con celebrazione "epica".
   - **Coach vocale (corsa e bici), calibrato sulla performance**: interviene solo
     quando serve — **battito fuori dalla zona target** (in base all'età; con
     battito alto dà la **guida alla respirazione**), **molto lontano

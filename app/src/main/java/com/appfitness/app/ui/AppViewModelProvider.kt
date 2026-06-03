@@ -6,6 +6,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.appfitness.app.AppFitnessApplication
+import com.appfitness.app.ui.achievements.AchievementsViewModel
 import com.appfitness.app.ui.cardio.CardioTestViewModel
 import com.appfitness.app.ui.exercises.ExerciseViewModel
 import com.appfitness.app.ui.gps.GpsViewModel
@@ -25,6 +26,7 @@ object AppViewModelProvider {
         initializer { ProgramsViewModel(repository()) }
         initializer { CardioTestViewModel(repository(), application().container.heartRateMonitor) }
         initializer { GpsViewModel(repository()) }
+        initializer { AchievementsViewModel(repository()) }
         initializer { WorkoutViewModel(repository(), this.createSavedStateHandle()) }
     }
 }
