@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.appfitness.app.data.entity.AssessmentResult
+import com.appfitness.app.data.entity.CardioAssessment
 import com.appfitness.app.data.entity.TrainingProgram
 import com.appfitness.app.data.model.FitnessLevel
 import com.appfitness.app.ui.AppViewModelProvider
@@ -43,11 +44,13 @@ import com.appfitness.app.ui.util.formatTimestamp
 @Composable
 fun ProgramsScreen(
     onStartSession: (Long) -> Unit,
+    onOpenCardioTest: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProgramsViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val programs by viewModel.programs.collectAsStateWithLifecycle()
     val assessment by viewModel.latestAssessment.collectAsStateWithLifecycle()
+    val cardio by viewModel.latestCardio.collectAsStateWithLifecycle()
 
     var showAssessment by remember { mutableStateOf(false) }
     var showCreate by remember { mutableStateOf(false) }
@@ -76,6 +79,8 @@ fun ProgramsScreen(
             }
 
             item { AssessmentCard(assessment) { showAssessment = true } }
+
+            item { CardioCard(cardio, onTest = onOpenCardioTest) }
 
             item {
                 Text(
@@ -117,7 +122,7 @@ fun ProgramsScreen(
 
     if (showCreate) {
         CreateProgramDialog(
-            suggestedLevel = assessment?.level ?: FitnessLevel.INTERMEDIO,
+            suggestedLevel = cardio?.level ?: assessment?.level ?: FitnessLevel.INTERMEDIO,
             onDismiss = { showCreate = false },
             onConfirm = { sport, level, weeks, sessions ->
                 viewModel.createProgram(sport, level, weeks, sessions)
@@ -156,6 +161,41 @@ private fun AssessmentCard(assessment: AssessmentResult?, onTest: () -> Unit) {
                     "${assessment.pushUps} push-up · ${assessment.squats} squat · ${assessment.plankSec}s plank — ${formatTimestamp(assessment.timestamp)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    "Tocca per rifare il test",
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CardioCard(cardio: CardioAssessment?, onTest: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onTest,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+        ),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                "❤️ Test cardio con fascia",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            if (cardio == null) {
+                Text(
+                    "Collega un cardiofrequenzimetro Bluetooth per stimare VO₂max e recupero cardiaco. Tocca per iniziare.",
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            } else {
+                Text(
+                    "VO₂max ${cardio.vo2max} (${cardio.category}) · HRR ${cardio.hrr} bpm · livello ${cardio.level.label}",
+                    style = MaterialTheme.typography.bodyMedium,
                 )
                 Text(
                     "Tocca per rifare il test",

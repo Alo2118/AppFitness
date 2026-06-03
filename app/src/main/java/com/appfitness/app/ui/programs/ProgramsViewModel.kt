@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appfitness.app.data.FitnessRepository
 import com.appfitness.app.data.entity.AssessmentResult
+import com.appfitness.app.data.entity.CardioAssessment
 import com.appfitness.app.data.entity.TrainingProgram
 import com.appfitness.app.data.model.FitnessLevel
 import com.appfitness.app.data.model.Sport
@@ -21,6 +22,12 @@ class ProgramsViewModel(private val repository: FitnessRepository) : ViewModel()
     )
 
     val latestAssessment: StateFlow<AssessmentResult?> = repository.latestAssessment.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = null,
+    )
+
+    val latestCardio: StateFlow<CardioAssessment?> = repository.latestCardioAssessment.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = null,

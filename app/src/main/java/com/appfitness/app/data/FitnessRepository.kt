@@ -1,11 +1,13 @@
 package com.appfitness.app.data
 
 import com.appfitness.app.data.dao.AssessmentDao
+import com.appfitness.app.data.dao.CardioAssessmentDao
 import com.appfitness.app.data.dao.ExerciseDao
 import com.appfitness.app.data.dao.MoodDao
 import com.appfitness.app.data.dao.ProgramDao
 import com.appfitness.app.data.dao.WorkoutDao
 import com.appfitness.app.data.entity.AssessmentResult
+import com.appfitness.app.data.entity.CardioAssessment
 import com.appfitness.app.data.entity.Exercise
 import com.appfitness.app.data.entity.MoodEntry
 import com.appfitness.app.data.entity.SetLog
@@ -17,6 +19,7 @@ import com.appfitness.app.data.relation.SessionWithSets
 import com.appfitness.app.domain.AdaptiveEngine
 import com.appfitness.app.domain.AssessmentEvaluator
 import com.appfitness.app.domain.GeneratedExercise
+import com.appfitness.app.domain.HrFitnessEvaluator
 import com.appfitness.app.domain.SportProgramGenerator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -31,6 +34,7 @@ class FitnessRepository(
     private val moodDao: MoodDao,
     private val programDao: ProgramDao,
     private val assessmentDao: AssessmentDao,
+    private val cardioAssessmentDao: CardioAssessmentDao,
 ) {
     // ----- Exercises -----
     val exercises: Flow<List<Exercise>> = exerciseDao.observeAll()
@@ -120,6 +124,34 @@ class FitnessRepository(
             )
         )
         return outcome.level
+    }
+
+    // ----- Cardio test (heart-rate monitor) -----
+    val latestCardioAssessment: Flow<CardioAssessment?> = cardioAssessmentDao.observeLatest()
+
+    /** Evaluates and stores a heart-rate based fitness test, returning the result. */
+    suspend fun saveCardioAssessment(
+        age: Int,
+        restingHr: Int,
+        peakHr: Int,
+        recoveryHr: Int,
+        deviceName: String,
+    ): CardioAssessment {
+        val outcome = HrFitnessEvaluator.evaluate(age, restingHr, peakHr, recoveryHr)
+        val record = CardioAssessment(
+            timestamp = System.currentTimeMillis(),
+            age = age,
+            restingHr = restingHr,
+            peakHr = peakHr,
+            recoveryHr = recoveryHr,
+            hrr = outcome.hrr,
+            vo2max = outcome.vo2max,
+            category = outcome.category,
+            level = outcome.level,
+            deviceName = deviceName,
+        )
+        val id = cardioAssessmentDao.insert(record)
+        return record.copy(id = id)
     }
 
     // ----- Sport programs -----

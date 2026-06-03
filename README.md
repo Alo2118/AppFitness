@@ -46,6 +46,11 @@ del benessere olistico ma con un'esecuzione semplice e offline-first.
 
 - **Test di inizio** — un assessment iniziale (push-up, squat in 60s, plank)
   calcola il **livello di partenza** e il carico di base per i programmi.
+- **Test cardio con cardiofrequenzimetro** — collega una fascia/orologio
+  **Bluetooth LE** (Heart Rate Service standard 0x180D) e svolgi un protocollo
+  guidato riposo → sforzo → recupero: l'app legge i BPM live e stima **VO₂max** e
+  **recupero cardiaco (HRR)**, derivandone una valutazione della condizione fisica
+  e un livello consigliato per i programmi.
 - **Programmi per sport specifico** — piani multi-settimana per Pallavolo,
   Ciclismo, Fitness, Calcio, Running, Nuoto, Tennis, Basket. Ogni sport alterna
   obiettivi (forza/cardio/total body) coerenti con la disciplina.

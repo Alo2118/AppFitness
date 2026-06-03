@@ -6,11 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.appfitness.app.data.dao.AssessmentDao
+import com.appfitness.app.data.dao.CardioAssessmentDao
 import com.appfitness.app.data.dao.ExerciseDao
 import com.appfitness.app.data.dao.MoodDao
 import com.appfitness.app.data.dao.ProgramDao
 import com.appfitness.app.data.dao.WorkoutDao
 import com.appfitness.app.data.entity.AssessmentResult
+import com.appfitness.app.data.entity.CardioAssessment
 import com.appfitness.app.data.entity.Exercise
 import com.appfitness.app.data.entity.MoodEntry
 import com.appfitness.app.data.entity.SetLog
@@ -20,9 +22,9 @@ import com.appfitness.app.data.entity.WorkoutSession
 @Database(
     entities = [
         Exercise::class, WorkoutSession::class, SetLog::class, MoodEntry::class,
-        TrainingProgram::class, AssessmentResult::class,
+        TrainingProgram::class, AssessmentResult::class, CardioAssessment::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)
@@ -33,6 +35,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun moodDao(): MoodDao
     abstract fun programDao(): ProgramDao
     abstract fun assessmentDao(): AssessmentDao
+    abstract fun cardioAssessmentDao(): CardioAssessmentDao
 
     companion object {
         @Volatile

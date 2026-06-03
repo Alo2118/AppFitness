@@ -23,6 +23,7 @@ import androidx.navigation.navArgument
 import com.appfitness.app.ui.exercises.ExerciseListScreen
 import com.appfitness.app.ui.history.HistoryScreen
 import com.appfitness.app.ui.home.HomeScreen
+import com.appfitness.app.ui.cardio.CardioTestScreen
 import com.appfitness.app.ui.mood.MoodScreen
 import com.appfitness.app.ui.programs.ProgramsScreen
 import com.appfitness.app.ui.navigation.Routes
@@ -98,7 +99,11 @@ fun AppFitnessApp() {
                     onStartSession = { sessionId ->
                         navController.navigate(Routes.workout(sessionId))
                     },
+                    onOpenCardioTest = { navController.navigate(Routes.CARDIO_TEST) },
                 )
+            }
+            composable(Routes.CARDIO_TEST) {
+                CardioTestScreen(onBack = { navController.popBackStack() })
             }
             composable(TopDestination.HISTORY.route) { HistoryScreen() }
             composable(TopDestination.MOOD.route) { MoodScreen() }

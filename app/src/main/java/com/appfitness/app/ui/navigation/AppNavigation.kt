@@ -30,4 +30,6 @@ enum class TopDestination(
 object Routes {
     const val WORKOUT = "workout"
     fun workout(sessionId: Long) = "$WORKOUT/$sessionId"
+
+    const val CARDIO_TEST = "cardioTest"
 }
