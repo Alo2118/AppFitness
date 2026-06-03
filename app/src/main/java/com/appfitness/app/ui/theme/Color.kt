@@ -2,9 +2,13 @@ package com.appfitness.app.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val GreenPrimary = Color(0xFF2E7D32)
-val GreenPrimaryDark = Color(0xFF81C784)
-val OrangeAccent = Color(0xFFF57C00)
-val OrangeAccentDark = Color(0xFFFFB74D)
-val TealSecondary = Color(0xFF00897B)
-val TealSecondaryDark = Color(0xFF4DB6AC)
+// Brand palette — energetic green + warm coral accent + cool teal.
+val BrandGreen = Color(0xFF1FB85C)
+val BrandGreenDark = Color(0xFF0E7A39)
+val Coral = Color(0xFFFF6B5E)
+val Teal = Color(0xFF12B5A8)
+val Ink = Color(0xFF111714)
+
+// Gradient stops used for hero headers.
+val GradientStart = Color(0xFF1FB85C)
+val GradientEnd = Color(0xFF12B5A8)

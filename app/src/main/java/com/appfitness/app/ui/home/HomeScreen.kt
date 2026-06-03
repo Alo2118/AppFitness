@@ -1,5 +1,7 @@
 package com.appfitness.app.ui.home
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -66,17 +69,7 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item {
-                Text(
-                    text = "Ciao! 👋",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 16.dp),
-                )
-                Text(
-                    text = "Pronto a muoverti e sentirti meglio?",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                HeroHeader(totalPoints = totalPoints, onClick = onOpenAchievements)
             }
 
             item {
@@ -101,10 +94,6 @@ fun HomeScreen(
 
             item {
                 GenerateCard(onClick = { showGenerateDialog = true })
-            }
-
-            item {
-                ProgressCard(totalPoints, onClick = onOpenAchievements)
             }
 
             item {
@@ -184,38 +173,71 @@ private fun GenerateCard(onClick: () -> Unit) {
 }
 
 @Composable
-private fun ProgressCard(totalPoints: Int, onClick: () -> Unit) {
+private fun HeroHeader(totalPoints: Int, onClick: () -> Unit) {
     val level = com.appfitness.app.domain.RewardLevels.levelFor(totalPoints)
     val progress = com.appfitness.app.domain.RewardLevels.levelProgress(totalPoints)
     val toNext = com.appfitness.app.domain.RewardLevels.pointsToNextLevel(totalPoints)
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onClick,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+    androidx.compose.foundation.layout.Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+            .clip(androidx.compose.foundation.shape.RoundedCornerShape(28.dp))
+            .background(
+                androidx.compose.ui.graphics.Brush.linearGradient(
+                    listOf(
+                        com.appfitness.app.ui.theme.GradientStart,
+                        com.appfitness.app.ui.theme.GradientEnd,
+                    )
+                )
+            )
+            .clickable(onClick = onClick)
+            .padding(20.dp),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column {
+            Text(
+                "Ciao! 👋",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = androidx.compose.ui.graphics.Color.White,
+            )
+            Text(
+                "Pronto a muoverti e sentirti meglio?",
+                style = MaterialTheme.typography.bodyMedium,
+                color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.85f),
+            )
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     "🏆 Livello $level",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
+                    color = androidx.compose.ui.graphics.Color.White,
                 )
-                Text("$totalPoints punti", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    "$totalPoints pt",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = androidx.compose.ui.graphics.Color.White,
+                )
             }
             androidx.compose.material3.LinearProgressIndicator(
                 progress = { progress },
+                color = androidx.compose.ui.graphics.Color.White,
+                trackColor = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.3f),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp),
+                    .padding(top = 8.dp)
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp)),
             )
             Text(
-                "Ancora $toNext punti al livello ${level + 1}",
+                "Ancora $toNext pt al livello ${level + 1} · tocca per i Traguardi",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 4.dp),
+                color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.85f),
+                modifier = Modifier.padding(top = 6.dp),
             )
         }
     }
