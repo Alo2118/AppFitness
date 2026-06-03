@@ -19,6 +19,8 @@ import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.appfitness.app.AppFitnessApplication
 import com.appfitness.app.R
+import com.appfitness.app.audio.SpeechCoach
+import com.appfitness.app.ble.HeartRateMonitor
 import com.appfitness.app.data.entity.GpsActivity
 import com.appfitness.app.data.entity.GpsPoint
 import com.appfitness.app.data.model.GpsActivityType
@@ -27,6 +29,8 @@ import com.appfitness.app.domain.GhostComparator
 import com.appfitness.app.domain.Ghosts
 import com.appfitness.app.domain.RouteSample
 import com.appfitness.app.domain.RouteTracker
+import com.appfitness.app.domain.RunCoachEngine
+import com.appfitness.app.domain.RunState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -52,11 +56,18 @@ class TrackingService : Service() {
     private var type = GpsActivityType.RUN
     private var tickJob: Job? = null
 
+    private val coach = RunCoachEngine()
+    private var speech: SpeechCoach? = null
+    private var monitor: HeartRateMonitor? = null
+    private var targetPaceSecPerKm: Double? = null
+
     private val listener = LocationListener { location -> onLocation(location) }
 
     override fun onCreate() {
         super.onCreate()
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        speech = SpeechCoach(this)
+        monitor = (application as AppFitnessApplication).container.heartRateMonitor
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -74,9 +85,11 @@ class TrackingService : Service() {
 
         TrackingState.resetForStart(type)
         startTime = System.currentTimeMillis()
+        coach.reset()
         configureGhost(intent)
         startForegroundNotification()
         requestUpdates()
+        speech?.speak(coach.startPhrase(targetPaceSecPerKm))
 
         tickJob?.cancel()
         tickJob = scope.launch {
@@ -85,6 +98,7 @@ class TrackingService : Service() {
                 val elapsed = elapsedSec()
                 TrackingState.elapsedSec.value = elapsed
                 updateGhostLead(elapsed)
+                speakCoaching(elapsed)
             }
         }
     }
@@ -94,19 +108,42 @@ class TrackingService : Service() {
             GhostMode.valueOf(intent?.getStringExtra(EXTRA_GHOST_MODE) ?: GhostMode.NONE.name)
         }.getOrDefault(GhostMode.NONE)
 
+        targetPaceSecPerKm = null
         ghost = when (mode) {
             GhostMode.NONE -> null
-            GhostMode.PACE -> Ghosts.pace(intent?.getDoubleExtra(EXTRA_PACE, 0.0) ?: 0.0)
-            GhostMode.TARGET_TIME -> Ghosts.targetTime(
-                distanceM = intent?.getDoubleExtra(EXTRA_TARGET_DISTANCE, 0.0) ?: 0.0,
-                totalSec = intent?.getIntExtra(EXTRA_TARGET_TIME, 0) ?: 0,
-            )
+            GhostMode.PACE -> {
+                val pace = intent?.getDoubleExtra(EXTRA_PACE, 0.0) ?: 0.0
+                targetPaceSecPerKm = pace.takeIf { it > 0 }
+                Ghosts.pace(pace)
+            }
+            GhostMode.TARGET_TIME -> {
+                val distanceM = intent?.getDoubleExtra(EXTRA_TARGET_DISTANCE, 0.0) ?: 0.0
+                val totalSec = intent?.getIntExtra(EXTRA_TARGET_TIME, 0) ?: 0
+                if (distanceM > 0) targetPaceSecPerKm = totalSec / (distanceM / 1000.0)
+                Ghosts.targetTime(distanceM, totalSec)
+            }
             GhostMode.REPLAY -> {
                 val id = intent?.getLongExtra(EXTRA_REPLAY_ID, -1L) ?: -1L
                 loadReplayGhost(id)
                 null // set asynchronously once points are loaded
             }
         }
+    }
+
+    /** Builds the current run state and speaks any coaching cue. */
+    private fun speakCoaching(elapsed: Int) {
+        val hr = monitor?.heartRate?.value
+        val cue = coach.onUpdate(
+            RunState(
+                elapsedSec = elapsed,
+                distanceM = tracker.totalDistanceM,
+                currentPaceSecPerKm = tracker.currentPaceSecPerKm(),
+                targetPaceSecPerKm = targetPaceSecPerKm,
+                ghostLeadM = TrackingState.ghostLeadM.value,
+                heartRateElevated = hr != null && hr >= HR_ELEVATED_BPM,
+            )
+        )
+        cue?.let { speech?.speak(it) }
     }
 
     private fun loadReplayGhost(activityId: Long) {
@@ -142,6 +179,7 @@ class TrackingService : Service() {
         TrackingState.distanceM.value = tracker.totalDistanceM
         TrackingState.paceSecPerKm.value = tracker.currentPaceSecPerKm()
         updateGhostLead(elapsed)
+        speakCoaching(elapsed)
     }
 
     private fun updateGhostLead(elapsed: Int) {
@@ -161,6 +199,7 @@ class TrackingService : Service() {
         val elapsed = ((endTime - startTime) / 1000).toInt()
         val distance = tracker.totalDistanceM
         val samples = tracker.samples.toList()
+        speech?.speak("Sessione completata. ${com.appfitness.app.domain.GeoUtils.formatKm(distance)} chilometri. Ottimo lavoro!")
 
         scope.launch {
             val repo = (application as AppFitnessApplication).container.repository
@@ -189,6 +228,7 @@ class TrackingService : Service() {
 
             TrackingState.lastSavedActivityId.value = savedId
             TrackingState.isTracking.value = false
+            delay(2500) // let the spoken summary finish before tearing down TTS
             ServiceCompat.stopForeground(this@TrackingService, ServiceCompat.STOP_FOREGROUND_REMOVE)
             stopSelf()
         }
@@ -222,12 +262,14 @@ class TrackingService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         runCatching { locationManager.removeUpdates(listener) }
+        speech?.shutdown()
         scope.cancel()
     }
 
     companion object {
         private const val CHANNEL_ID = "gps_tracking"
         private const val NOTIFICATION_ID = 42
+        private const val HR_ELEVATED_BPM = 150
 
         const val ACTION_START = "com.appfitness.app.action.START_TRACKING"
         const val ACTION_STOP = "com.appfitness.app.action.STOP_TRACKING"

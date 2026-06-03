@@ -49,6 +49,10 @@ del benessere olistico ma con un'esecuzione semplice e offline-first.
   spento) e gareggia contro un **fantasma**: una **sessione precedente**, un
   **ritmo costante** o un **tempo obiettivo** da battere. In tempo reale mostra se
   sei *avanti* o *indietro* e di quanti metri.
+  - **Coach vocale durante la corsa**: avvisi parlati sullo **stato rispetto
+    all'obiettivo** (a ogni km: ritmo + distacco dal fantasma), **aiuti per
+    tenere il ritmo** ("accelera"/"puoi rallentare") e **guida alla respirazione**
+    quando rileva difficoltà (battito alto, ritmo che crolla o distacco crescente).
 - **Test di inizio** — un assessment iniziale (push-up, squat in 60s, plank)
   calcola il **livello di partenza** e il carico di base per i programmi.
 - **Test cardio con cardiofrequenzimetro** — collega una fascia/orologio
