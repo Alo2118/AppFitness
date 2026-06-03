@@ -57,6 +57,13 @@ del benessere olistico ma con un'esecuzione semplice e offline-first.
 - **Programmazione adattiva** — dopo ogni sessione del programma il carico si
   ricalibra automaticamente in base a **% serie completate + energia post-workout**:
   progressione quando vai forte, scarico quando fai fatica, con suggerimento testuale.
+- **Allenamento guidato con sensori (coach vocale)** — durante una serie a
+  ripetizioni, il telefono (indossato al polso) conta le **ripetizioni reali**
+  tramite l'accelerometro, legge il **battito** dalla fascia cardio e fa da
+  personal trainer **a voce**: incoraggia, rileva la fatica (cadenza che cala o
+  battito alto) e ti spinge — *"Forza, ancora 2 ripetizioni!"* — fino a
+  completare la serie, salvando il conteggio effettivo. Conteggio manuale di
+  riserva se l'accelerometro non rileva.
 - **Generatore di percorsi completi** — scegli obiettivo (forza, cardio,
   dimagrimento, mobilità, total body), livello e durata: l'app costruisce un
   allenamento completo dalla libreria, adattando serie/ripetizioni/recupero e

@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -41,6 +42,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.appfitness.app.data.entity.SetLog
 import com.appfitness.app.ui.AppViewModelProvider
 import com.appfitness.app.ui.exercises.ExerciseViewModel
+import com.appfitness.app.ui.guided.GuidedSetDialog
 import com.appfitness.app.ui.util.formatDuration
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,6 +59,7 @@ fun WorkoutScreen(
 
     var showPicker by remember { mutableStateOf(false) }
     var showFinish by remember { mutableStateOf(false) }
+    var guidedSet by remember { mutableStateOf<SetLog?>(null) }
 
     val sets = session?.sets.orEmpty()
 
@@ -124,6 +127,7 @@ fun WorkoutScreen(
                                 onUpdate = viewModel::updateSet,
                                 onToggle = viewModel::toggleCompleted,
                                 onDelete = viewModel::deleteSet,
+                                onGuided = { guidedSet = it },
                             )
                         }
                     }
@@ -155,6 +159,19 @@ fun WorkoutScreen(
                 showFinish = false
                 viewModel.finishWorkout(mood, energy, note, onFinished)
             },
+        )
+    }
+
+    guidedSet?.let { set ->
+        GuidedSetDialog(
+            exerciseName = set.exerciseName,
+            targetReps = set.reps,
+            onDone = { actualReps ->
+                viewModel.updateSet(set.copy(reps = actualReps, completed = true))
+                if (set.restSec > 0) viewModel.startRest(set.restSec)
+                guidedSet = null
+            },
+            onCancel = { guidedSet = null },
         )
     }
 }
@@ -204,6 +221,7 @@ private fun ExerciseBlock(
     onUpdate: (SetLog) -> Unit,
     onToggle: (SetLog) -> Unit,
     onDelete: (Long) -> Unit,
+    onGuided: (SetLog) -> Unit,
 ) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -218,6 +236,7 @@ private fun ExerciseBlock(
                     onUpdate = onUpdate,
                     onToggle = { onToggle(set) },
                     onDelete = { onDelete(set.id) },
+                    onGuided = { onGuided(set) },
                 )
             }
         }
@@ -230,6 +249,7 @@ private fun SetRow(
     onUpdate: (SetLog) -> Unit,
     onToggle: () -> Unit,
     onDelete: () -> Unit,
+    onGuided: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -270,6 +290,11 @@ private fun SetRow(
             }
         }
 
+        if (!set.isTimeBased) {
+            IconButton(onClick = onGuided) {
+                Icon(Icons.Filled.PlayCircle, contentDescription = "Modalità guidata")
+            }
+        }
         FilledIconButton(onClick = onToggle) {
             Icon(
                 imageVector = if (set.completed) Icons.Filled.Check else Icons.Filled.Add,
