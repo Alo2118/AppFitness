@@ -30,6 +30,9 @@ object TrackingState {
     val hasGpsFix = MutableStateFlow(false)
     val lastSavedActivityId = MutableStateFlow<Long?>(null)
 
+    /** Live route as (lat, lon) pairs, for the map. */
+    val path = MutableStateFlow<List<Pair<Double, Double>>>(emptyList())
+
     fun resetForStart(activityType: GpsActivityType) {
         type.value = activityType
         elapsedSec.value = 0
@@ -38,6 +41,7 @@ object TrackingState {
         ghostLeadM.value = null
         hasGpsFix.value = false
         lastSavedActivityId.value = null
+        path.value = emptyList()
         isTracking.value = true
     }
 }

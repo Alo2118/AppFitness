@@ -34,4 +34,6 @@ object Routes {
     const val CARDIO_TEST = "cardioTest"
     const val GPS = "gps"
     const val GPS_TRACKING = "gpsTracking"
+    const val GPS_DETAIL = "gpsDetail"
+    fun gpsDetail(activityId: Long) = "$GPS_DETAIL/$activityId"
 }

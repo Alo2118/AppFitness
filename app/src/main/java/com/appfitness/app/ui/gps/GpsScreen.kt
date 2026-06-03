@@ -47,6 +47,7 @@ import com.appfitness.app.ui.util.formatTimestamp
 fun GpsScreen(
     onBack: () -> Unit,
     onStartTracking: () -> Unit,
+    onOpenActivity: (Long) -> Unit,
     viewModel: GpsViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val activities by viewModel.activities.collectAsStateWithLifecycle()
@@ -100,7 +101,11 @@ fun GpsScreen(
                 }
             } else {
                 items(activities, key = { it.id }) { activity ->
-                    ActivityCard(activity, onDelete = { viewModel.delete(activity.id) })
+                    ActivityCard(
+                        activity,
+                        onClick = { onOpenActivity(activity.id) },
+                        onDelete = { viewModel.delete(activity.id) },
+                    )
                 }
             }
         }
@@ -124,8 +129,8 @@ fun GpsScreen(
 }
 
 @Composable
-private fun ActivityCard(activity: GpsActivity, onDelete: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+private fun ActivityCard(activity: GpsActivity, onClick: () -> Unit, onDelete: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth(), onClick = onClick) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

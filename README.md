@@ -49,6 +49,9 @@ del benessere olistico ma con un'esecuzione semplice e offline-first.
   spento) e gareggia contro un **fantasma**: una **sessione precedente**, un
   **ritmo costante** o un **tempo obiettivo** da battere. In tempo reale mostra se
   sei *avanti* o *indietro* e di quanti metri.
+  - **Percorso su mappa**: la traccia GPS è disegnata su mappa **OpenStreetMap**
+    (osmdroid, senza API key) sia **dal vivo** durante l'attività sia nel
+    **dettaglio** di ogni sessione salvata (con marker di partenza e arrivo).
   - **Coach vocale (corsa e bici), calibrato sulla performance**: interviene solo
     quando serve — **battito fuori dalla zona target** (in base all'età; con
     battito alto dà la **guida alla respirazione**), **molto lontano

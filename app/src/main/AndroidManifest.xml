@@ -4,6 +4,10 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- OpenStreetMap tiles for the route map. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <!-- Bluetooth Low Energy for connecting a heart-rate monitor (chest strap / watch). -->
     <uses-permission
         android:name="android.permission.BLUETOOTH"

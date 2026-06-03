@@ -187,6 +187,7 @@ class TrackingService : Service() {
         TrackingState.hasGpsFix.value = true
         TrackingState.distanceM.value = tracker.totalDistanceM
         TrackingState.paceSecPerKm.value = tracker.currentPaceSecPerKm()
+        TrackingState.path.value = TrackingState.path.value + (location.latitude to location.longitude)
         updateGhostLead(elapsed)
         speakCoaching(elapsed)
     }
