@@ -8,7 +8,9 @@ import com.appfitness.app.data.entity.MoodEntry
 import com.appfitness.app.data.entity.SetLog
 import com.appfitness.app.data.entity.WorkoutSession
 import com.appfitness.app.data.relation.SessionWithSets
+import com.appfitness.app.domain.GeneratedExercise
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 
 /**
  * Single source of truth for all app data. ViewModels talk only to this class,
@@ -21,6 +23,7 @@ class FitnessRepository(
 ) {
     // ----- Exercises -----
     val exercises: Flow<List<Exercise>> = exerciseDao.observeAll()
+    suspend fun exercisesSnapshot(): List<Exercise> = exerciseDao.observeAll().first()
     suspend fun getExercise(id: Long) = exerciseDao.getById(id)
     suspend fun upsertExercise(exercise: Exercise) = exerciseDao.upsert(exercise)
     suspend fun deleteCustomExercise(id: Long) = exerciseDao.deleteCustom(id)
@@ -37,6 +40,43 @@ class FitnessRepository(
     fun observeSession(id: Long): Flow<SessionWithSets?> = workoutDao.observeSessionWithSets(id)
     suspend fun getSession(id: Long) = workoutDao.getSession(id)
     suspend fun startSession(session: WorkoutSession): Long = workoutDao.insertSession(session)
+
+    /**
+     * Creates a new in-progress session pre-populated with the sets of a
+     * generated plan, returning the session id ready for the workout screen.
+     */
+    suspend fun startGeneratedSession(
+        title: String,
+        moodBefore: Int?,
+        energyBefore: Int?,
+        plan: List<GeneratedExercise>,
+    ): Long {
+        val sessionId = workoutDao.insertSession(
+            WorkoutSession(
+                title = title,
+                startedAt = System.currentTimeMillis(),
+                moodBefore = moodBefore,
+                energyBefore = energyBefore,
+            )
+        )
+        plan.forEach { item ->
+            repeat(item.sets) { index ->
+                workoutDao.insertSet(
+                    SetLog(
+                        sessionId = sessionId,
+                        exerciseId = item.exercise.id,
+                        exerciseName = item.exercise.name,
+                        setNumber = index + 1,
+                        reps = item.reps,
+                        durationSec = item.durationSec,
+                        restSec = item.restSec,
+                        isTimeBased = item.exercise.isTimeBased,
+                    )
+                )
+            }
+        }
+        return sessionId
+    }
     suspend fun updateSession(session: WorkoutSession) = workoutDao.updateSession(session)
     suspend fun deleteSession(id: Long) = workoutDao.deleteSession(id)
 

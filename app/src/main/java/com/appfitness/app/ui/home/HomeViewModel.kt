@@ -6,6 +6,7 @@ import com.appfitness.app.data.FitnessRepository
 import com.appfitness.app.data.entity.MoodEntry
 import com.appfitness.app.data.entity.WorkoutSession
 import com.appfitness.app.data.relation.SessionWithSets
+import com.appfitness.app.domain.GeneratedExercise
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -51,6 +52,20 @@ class HomeViewModel(private val repository: FitnessRepository) : ViewModel() {
                     energyBefore = energyBefore,
                 )
             )
+            onCreated(id)
+        }
+    }
+
+    /** Persists a generated plan as a new in-progress session. */
+    fun startGenerated(
+        title: String,
+        moodBefore: Int?,
+        energyBefore: Int?,
+        plan: List<GeneratedExercise>,
+        onCreated: (Long) -> Unit,
+    ) {
+        viewModelScope.launch {
+            val id = repository.startGeneratedSession(title, moodBefore, energyBefore, plan)
             onCreated(id)
         }
     }

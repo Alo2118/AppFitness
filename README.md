@@ -44,6 +44,11 @@ del benessere olistico ma con un'esecuzione semplice e offline-first.
 
 ## ✨ Funzionalità implementate
 
+- **Generatore di percorsi completi** — scegli obiettivo (forza, cardio,
+  dimagrimento, mobilità, total body), livello e durata: l'app costruisce un
+  allenamento completo dalla libreria, adattando serie/ripetizioni/recupero e
+  **modulando l'intensità in base all'energia del giorno**. Anteprima, "rigenera"
+  e avvio in un tap.
 - **Libreria esercizi** — 12 esercizi pre-caricati (forza, cardio, core, mobilità,
   total body) filtrabili per categoria + creazione di esercizi personalizzati.
 - **Sessione di allenamento** con:

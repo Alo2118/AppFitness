@@ -43,6 +43,7 @@ fun HomeScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var showStartDialog by remember { mutableStateOf(false) }
+    var showGenerateDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier,
@@ -96,6 +97,10 @@ fun HomeScreen(
             }
 
             item {
+                GenerateCard(onClick = { showGenerateDialog = true })
+            }
+
+            item {
                 Text(
                     text = "Allenamenti recenti",
                     style = MaterialTheme.typography.titleMedium,
@@ -130,6 +135,40 @@ fun HomeScreen(
                 viewModel.startWorkout(title, mood, energy, onStartWorkout)
             },
         )
+    }
+
+    if (showGenerateDialog) {
+        GenerateWorkoutDialog(
+            onDismiss = { showGenerateDialog = false },
+            onConfirm = { title, mood, energy, plan ->
+                showGenerateDialog = false
+                viewModel.startGenerated(title, mood, energy, plan, onStartWorkout)
+            },
+        )
+    }
+}
+
+@Composable
+private fun GenerateCard(onClick: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+        ),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "✨ Genera un percorso completo",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                text = "Scegli obiettivo, livello e durata: costruiamo noi l'allenamento, adattato alla tua energia di oggi.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 
