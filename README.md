@@ -52,6 +52,13 @@ del benessere olistico ma con un'esecuzione semplice e offline-first.
   - **Percorso su mappa**: la traccia GPS è disegnata su mappa **OpenStreetMap**
     (osmdroid, senza API key) sia **dal vivo** durante l'attività sia nel
     **dettaglio** di ogni sessione salvata (con marker di partenza e arrivo).
+  - **Export GPX**: condividi il percorso di qualsiasi attività in formato GPX
+    standard (compatibile con Strava, Garmin, ecc.).
+  - **Sistema di ricompense (dopamina)**: durante la sessione un motore di reward
+    dà rinforzo immediato — **punteggio live**, **combo** sugli split più veloci,
+    **bonus a sorpresa** a rapporto variabile, **traguardi** di distanza, sorpasso
+    del fantasma, minuti in zona e **record personali** — con celebrazione
+    **vocale + vibrazione + banner animato**.
   - **Coach vocale (corsa e bici), calibrato sulla performance**: interviene solo
     quando serve — **battito fuori dalla zona target** (in base all'età; con
     battito alto dà la **guida alla respirazione**), **molto lontano

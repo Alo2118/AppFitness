@@ -1,6 +1,7 @@
 package com.appfitness.app.tracking
 
 import com.appfitness.app.data.model.GpsActivityType
+import com.appfitness.app.domain.RewardEvent
 import kotlinx.coroutines.flow.MutableStateFlow
 
 /** Where a ghost opponent comes from. */
@@ -33,6 +34,11 @@ object TrackingState {
     /** Live route as (lat, lon) pairs, for the map. */
     val path = MutableStateFlow<List<Pair<Double, Double>>>(emptyList())
 
+    /** Gamification: live session score and the most recent reward to celebrate. */
+    val score = MutableStateFlow(0)
+    val lastReward = MutableStateFlow<RewardEvent?>(null)
+    val rewardCount = MutableStateFlow(0) // increments per reward, so the UI can re-animate
+
     fun resetForStart(activityType: GpsActivityType) {
         type.value = activityType
         elapsedSec.value = 0
@@ -42,6 +48,9 @@ object TrackingState {
         hasGpsFix.value = false
         lastSavedActivityId.value = null
         path.value = emptyList()
+        score.value = 0
+        lastReward.value = null
+        rewardCount.value = 0
         isTracking.value = true
     }
 }

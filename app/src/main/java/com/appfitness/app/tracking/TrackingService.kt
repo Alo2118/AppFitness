@@ -14,6 +14,9 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.IBinder
 import android.os.Looper
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
@@ -28,9 +31,14 @@ import com.appfitness.app.domain.Ghost
 import com.appfitness.app.domain.GhostComparator
 import com.appfitness.app.domain.Ghosts
 import com.appfitness.app.domain.HeartRateZone
+import com.appfitness.app.domain.HeartRateZoneEvaluator
+import com.appfitness.app.domain.RewardEngine
+import com.appfitness.app.domain.RewardEvent
+import com.appfitness.app.domain.RewardTier
 import com.appfitness.app.domain.RouteSample
 import com.appfitness.app.domain.RouteTracker
 import com.appfitness.app.domain.RunCoachEngine
+import com.appfitness.app.domain.RunRewardState
 import com.appfitness.app.domain.RunState
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.CoroutineScope
@@ -59,8 +67,10 @@ class TrackingService : Service() {
     private var tickJob: Job? = null
 
     private val coach = RunCoachEngine()
+    private val rewards = RewardEngine()
     private var speech: SpeechCoach? = null
     private var monitor: HeartRateMonitor? = null
+    private var vibrator: Vibrator? = null
     private var targetPaceSecPerKm: Double? = null
     private var userAge: Int = 30
 
@@ -71,6 +81,12 @@ class TrackingService : Service() {
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         speech = SpeechCoach(this)
         monitor = (application as AppFitnessApplication).container.heartRateMonitor
+        vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            (getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager)?.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -89,6 +105,7 @@ class TrackingService : Service() {
         TrackingState.resetForStart(type)
         startTime = System.currentTimeMillis()
         coach.reset()
+        rewards.reset()
         configureGhost(intent)
         startForegroundNotification()
         requestUpdates()
@@ -106,8 +123,44 @@ class TrackingService : Service() {
                 TrackingState.elapsedSec.value = elapsed
                 updateGhostLead(elapsed)
                 speakCoaching(elapsed)
+                rewardStep(elapsed)
             }
         }
+    }
+
+    /** Computes performance rewards and celebrates them (score + voice + haptics). */
+    private fun rewardStep(elapsed: Int) {
+        val hr = monitor?.heartRate?.value
+        val inZone = hr != null &&
+            HeartRateZoneEvaluator.zoneFor(hr, userAge) == HeartRateZone.AEROBICA
+        val event = rewards.onUpdate(
+            RunRewardState(
+                distanceM = tracker.totalDistanceM,
+                elapsedSec = elapsed,
+                ghostLeadM = TrackingState.ghostLeadM.value,
+                hrInTargetZone = inZone,
+            )
+        ) ?: return
+        celebrate(event)
+    }
+
+    private fun celebrate(event: RewardEvent) {
+        TrackingState.score.value = rewards.totalScore
+        TrackingState.lastReward.value = event
+        TrackingState.rewardCount.value += 1
+        vibrate(event.tier)
+        // Speak the bigger wins; small ones stay haptic + visual to avoid chatter.
+        if (event.tier != RewardTier.SMALL) speech?.speak(event.title)
+    }
+
+    private fun vibrate(tier: RewardTier) {
+        val v = vibrator ?: return
+        val pattern = when (tier) {
+            RewardTier.SMALL -> longArrayOf(0, 80)
+            RewardTier.MEDIUM -> longArrayOf(0, 120, 80, 120)
+            RewardTier.EPIC -> longArrayOf(0, 200, 100, 200, 100, 300)
+        }
+        runCatching { v.vibrate(VibrationEffect.createWaveform(pattern, -1)) }
     }
 
     private fun configureGhost(intent: Intent?) {
@@ -190,6 +243,7 @@ class TrackingService : Service() {
         TrackingState.path.value = TrackingState.path.value + (location.latitude to location.longitude)
         updateGhostLead(elapsed)
         speakCoaching(elapsed)
+        rewardStep(elapsed)
     }
 
     private fun updateGhostLead(elapsed: Int) {
@@ -213,6 +267,18 @@ class TrackingService : Service() {
 
         scope.launch {
             val repo = (application as AppFitnessApplication).container.repository
+
+            // Personal record: longest distance for this activity type so far.
+            val previousBest = repo.gpsActivities.first()
+                .filter { it.type == type }
+                .maxOfOrNull { it.distanceM } ?: 0f
+            if (distance > previousBest && distance > 0) {
+                val event = rewards.personalRecord(
+                    "🏆 Nuovo record di distanza: ${com.appfitness.app.domain.GeoUtils.formatKm(distance)} km!",
+                )
+                celebrate(event)
+            }
+
             val savedId = if (distance > 0) {
                 repo.saveGpsActivity(
                     activity = GpsActivity(

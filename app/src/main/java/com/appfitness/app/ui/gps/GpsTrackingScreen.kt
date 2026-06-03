@@ -15,7 +15,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.appfitness.app.domain.GeoUtils
+import com.appfitness.app.domain.RewardEvent
+import com.appfitness.app.domain.RewardTier
 import com.appfitness.app.tracking.TrackingService
 import com.appfitness.app.tracking.TrackingState
 import com.appfitness.app.ui.util.formatDuration
@@ -43,6 +49,18 @@ fun GpsTrackingScreen(onFinished: () -> Unit) {
     val ghostLead by TrackingState.ghostLeadM.collectAsStateWithLifecycle()
     val hasFix by TrackingState.hasGpsFix.collectAsStateWithLifecycle()
     val path by TrackingState.path.collectAsStateWithLifecycle()
+    val score by TrackingState.score.collectAsStateWithLifecycle()
+    val rewardCount by TrackingState.rewardCount.collectAsStateWithLifecycle()
+    val lastReward by TrackingState.lastReward.collectAsStateWithLifecycle()
+
+    var showReward by remember { mutableStateOf(false) }
+    LaunchedEffect(rewardCount) {
+        if (rewardCount > 0) {
+            showReward = true
+            kotlinx.coroutines.delay(3500)
+            showReward = false
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -74,6 +92,18 @@ fun GpsTrackingScreen(onFinished: () -> Unit) {
             color = if (hasFix) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
         )
 
+        Text(
+            "⭐ $score punti",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.tertiary,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+
+        androidx.compose.animation.AnimatedVisibility(visible = showReward && lastReward != null) {
+            lastReward?.let { RewardBanner(it) }
+        }
+
         Spacer(Modifier.height(24.dp))
         Text(
             text = GeoUtils.formatKm(distance),
@@ -102,6 +132,40 @@ fun GpsTrackingScreen(onFinished: () -> Unit) {
             Text("Attività salvata ✔", fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(8.dp))
             Button(onClick = onFinished, modifier = Modifier.fillMaxWidth()) { Text("Chiudi") }
+        }
+    }
+}
+
+@Composable
+private fun RewardBanner(reward: RewardEvent) {
+    val container = when (reward.tier) {
+        RewardTier.EPIC -> MaterialTheme.colorScheme.tertiaryContainer
+        RewardTier.MEDIUM -> MaterialTheme.colorScheme.primaryContainer
+        RewardTier.SMALL -> MaterialTheme.colorScheme.secondaryContainer
+    }
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = container),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                reward.title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+            )
+            Text(
+                "+${reward.points} punti",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+            )
         }
     }
 }
