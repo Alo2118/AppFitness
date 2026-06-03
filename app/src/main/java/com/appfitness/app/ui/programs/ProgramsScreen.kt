@@ -83,19 +83,16 @@ fun ProgramsScreen(
             item { CardioCard(cardio, onTest = onOpenCardioTest) }
 
             item {
-                Text(
+                com.appfitness.app.ui.components.SectionTitle(
                     "I tuoi programmi",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(top = 4.dp),
                 )
             }
 
             if (programs.isEmpty()) {
                 item {
-                    Text(
+                    com.appfitness.app.ui.components.EmptyHint(
                         "Nessun programma. Tocca + per crearne uno specifico per il tuo sport.",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             } else {

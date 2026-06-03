@@ -50,12 +50,7 @@ fun HistoryScreen(
             )
         }
         if (sessions.isEmpty()) {
-            item {
-                Text(
-                    "Nessun allenamento completato.",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            item { com.appfitness.app.ui.components.EmptyHint("Nessun allenamento completato.") }
         } else {
             items(sessions, key = { it.session.id }) { session ->
                 SessionDetailCard(session, onDelete = { viewModel.delete(session.session.id) })

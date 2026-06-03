@@ -34,6 +34,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.appfitness.app.data.model.MoodLevel
 import com.appfitness.app.data.relation.SessionWithSets
 import com.appfitness.app.ui.AppViewModelProvider
+import com.appfitness.app.ui.components.EmptyHint
+import com.appfitness.app.ui.components.SectionTitle
+import com.appfitness.app.ui.components.StatTile
 import com.appfitness.app.ui.util.formatDuration
 import com.appfitness.app.ui.util.formatTimestamp
 
@@ -74,17 +77,17 @@ fun HomeScreen(
 
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    StatCard(
+                    StatTile(
                         value = state.weekWorkouts.toString(),
                         label = "Allenamenti\nquesta settimana",
                         modifier = Modifier.weight(1f),
                     )
-                    StatCard(
+                    StatTile(
                         value = "${state.weekMinutes}'",
                         label = "Minuti\nattivi",
                         modifier = Modifier.weight(1f),
                     )
-                    StatCard(
+                    StatTile(
                         value = moodAverageEmoji(state),
                         label = "Umore\nrecente",
                         modifier = Modifier.weight(1f),
@@ -101,21 +104,12 @@ fun HomeScreen(
             }
 
             item {
-                Text(
-                    text = "Allenamenti recenti",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 8.dp),
-                )
+                SectionTitle("Allenamenti recenti", modifier = Modifier.padding(top = 8.dp))
             }
 
             if (state.recentSessions.isEmpty()) {
                 item {
-                    Text(
-                        text = "Nessun allenamento ancora. Tocca \"Inizia allenamento\" per cominciare!",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    EmptyHint("Nessun allenamento ancora. Tocca \"Inizia allenamento\" per cominciare!")
                 }
             } else {
                 items(state.recentSessions, key = { it.session.id }) { session ->
@@ -261,34 +255,6 @@ private fun GpsCard(onClick: () -> Unit) {
             Text(
                 text = "Traccia il percorso e sfida un fantasma: una tua sessione, un ritmo costante o un tempo da battere.",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
-private fun StatCard(value: String, label: String, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-        ),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp, horizontal = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = value,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }

@@ -77,12 +77,7 @@ fun MoodScreen(
             }
 
             if (entries.isEmpty()) {
-                item {
-                    Text(
-                        "Nessuna registrazione. Tocca + per il tuo primo check-in.",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
+                item { com.appfitness.app.ui.components.EmptyHint("Nessuna registrazione. Tocca + per il tuo primo check-in.") }
             } else {
                 items(entries, key = { it.id }) { entry ->
                     MoodCard(entry, onDelete = { viewModel.delete(entry.id) })
