@@ -24,6 +24,8 @@ import com.appfitness.app.ui.exercises.ExerciseListScreen
 import com.appfitness.app.ui.history.HistoryScreen
 import com.appfitness.app.ui.home.HomeScreen
 import com.appfitness.app.ui.cardio.CardioTestScreen
+import com.appfitness.app.ui.gps.GpsScreen
+import com.appfitness.app.ui.gps.GpsTrackingScreen
 import com.appfitness.app.ui.mood.MoodScreen
 import com.appfitness.app.ui.programs.ProgramsScreen
 import com.appfitness.app.ui.navigation.Routes
@@ -92,6 +94,7 @@ fun AppFitnessApp() {
                         navController.navigate(Routes.workout(sessionId))
                     },
                     onOpenSession = { /* history detail lives in the History tab */ },
+                    onOpenGps = { navController.navigate(Routes.GPS) },
                 )
             }
             composable(TopDestination.PROGRAMS.route) {
@@ -104,6 +107,15 @@ fun AppFitnessApp() {
             }
             composable(Routes.CARDIO_TEST) {
                 CardioTestScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Routes.GPS) {
+                GpsScreen(
+                    onBack = { navController.popBackStack() },
+                    onStartTracking = { navController.navigate(Routes.GPS_TRACKING) },
+                )
+            }
+            composable(Routes.GPS_TRACKING) {
+                GpsTrackingScreen(onFinished = { navController.popBackStack() })
             }
             composable(TopDestination.HISTORY.route) { HistoryScreen() }
             composable(TopDestination.MOOD.route) { MoodScreen() }

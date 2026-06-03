@@ -3,18 +3,22 @@ package com.appfitness.app.data
 import com.appfitness.app.data.dao.AssessmentDao
 import com.appfitness.app.data.dao.CardioAssessmentDao
 import com.appfitness.app.data.dao.ExerciseDao
+import com.appfitness.app.data.dao.GpsDao
 import com.appfitness.app.data.dao.MoodDao
 import com.appfitness.app.data.dao.ProgramDao
 import com.appfitness.app.data.dao.WorkoutDao
 import com.appfitness.app.data.entity.AssessmentResult
 import com.appfitness.app.data.entity.CardioAssessment
 import com.appfitness.app.data.entity.Exercise
+import com.appfitness.app.data.entity.GpsActivity
+import com.appfitness.app.data.entity.GpsPoint
 import com.appfitness.app.data.entity.MoodEntry
 import com.appfitness.app.data.entity.SetLog
 import com.appfitness.app.data.entity.TrainingProgram
 import com.appfitness.app.data.entity.WorkoutSession
 import com.appfitness.app.data.model.FitnessLevel
 import com.appfitness.app.data.model.Sport
+import com.appfitness.app.data.relation.ActivityWithPoints
 import com.appfitness.app.data.relation.SessionWithSets
 import com.appfitness.app.domain.AdaptiveEngine
 import com.appfitness.app.domain.AssessmentEvaluator
@@ -35,6 +39,7 @@ class FitnessRepository(
     private val programDao: ProgramDao,
     private val assessmentDao: AssessmentDao,
     private val cardioAssessmentDao: CardioAssessmentDao,
+    private val gpsDao: GpsDao,
 ) {
     // ----- Exercises -----
     val exercises: Flow<List<Exercise>> = exerciseDao.observeAll()
@@ -124,6 +129,21 @@ class FitnessRepository(
             )
         )
         return outcome.level
+    }
+
+    // ----- GPS activities (run / bike) -----
+    val gpsActivities: Flow<List<GpsActivity>> = gpsDao.observeActivities()
+    suspend fun getActivityWithPoints(id: Long): ActivityWithPoints? =
+        gpsDao.getActivityWithPoints(id)
+    suspend fun deleteGpsActivity(id: Long) = gpsDao.deleteActivity(id)
+
+    /** Persists a finished GPS activity with all its recorded points. */
+    suspend fun saveGpsActivity(activity: GpsActivity, points: List<GpsPoint>): Long {
+        val id = gpsDao.insertActivity(activity)
+        if (points.isNotEmpty()) {
+            gpsDao.insertPoints(points.map { it.copy(activityId = id) })
+        }
+        return id
     }
 
     // ----- Cardio test (heart-rate monitor) -----

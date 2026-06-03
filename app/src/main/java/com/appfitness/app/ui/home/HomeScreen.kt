@@ -38,6 +38,7 @@ import com.appfitness.app.ui.util.formatTimestamp
 fun HomeScreen(
     onStartWorkout: (Long) -> Unit,
     onOpenSession: (Long) -> Unit,
+    onOpenGps: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
@@ -98,6 +99,10 @@ fun HomeScreen(
 
             item {
                 GenerateCard(onClick = { showGenerateDialog = true })
+            }
+
+            item {
+                GpsCard(onClick = onOpenGps)
             }
 
             item {
@@ -165,6 +170,30 @@ private fun GenerateCard(onClick: () -> Unit) {
             )
             Text(
                 text = "Scegli obiettivo, livello e durata: costruiamo noi l'allenamento, adattato alla tua energia di oggi.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun GpsCard(onClick: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        ),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "🏃 Corsa & Bici (GPS)",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                text = "Traccia il percorso e sfida un fantasma: una tua sessione, un ritmo costante o un tempo da battere.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

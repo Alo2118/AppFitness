@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.appfitness.app.AppFitnessApplication
 import com.appfitness.app.ui.cardio.CardioTestViewModel
 import com.appfitness.app.ui.exercises.ExerciseViewModel
+import com.appfitness.app.ui.gps.GpsViewModel
 import com.appfitness.app.ui.history.HistoryViewModel
 import com.appfitness.app.ui.home.HomeViewModel
 import com.appfitness.app.ui.mood.MoodViewModel
@@ -23,6 +24,7 @@ object AppViewModelProvider {
         initializer { HistoryViewModel(repository()) }
         initializer { ProgramsViewModel(repository()) }
         initializer { CardioTestViewModel(repository(), application().container.heartRateMonitor) }
+        initializer { GpsViewModel(repository()) }
         initializer { WorkoutViewModel(repository(), this.createSavedStateHandle()) }
     }
 }

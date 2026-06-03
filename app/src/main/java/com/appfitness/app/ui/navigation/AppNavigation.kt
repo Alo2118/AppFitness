@@ -32,4 +32,6 @@ object Routes {
     fun workout(sessionId: Long) = "$WORKOUT/$sessionId"
 
     const val CARDIO_TEST = "cardioTest"
+    const val GPS = "gps"
+    const val GPS_TRACKING = "gpsTracking"
 }

@@ -3,6 +3,7 @@ package com.appfitness.app.data
 import androidx.room.TypeConverter
 import com.appfitness.app.data.model.ExerciseCategory
 import com.appfitness.app.data.model.FitnessLevel
+import com.appfitness.app.data.model.GpsActivityType
 import com.appfitness.app.data.model.Sport
 
 /** Room type converters for the enums we persist. */
@@ -27,4 +28,11 @@ class Converters {
     @TypeConverter
     fun stringToLevel(value: String): FitnessLevel =
         runCatching { FitnessLevel.valueOf(value) }.getOrDefault(FitnessLevel.INTERMEDIO)
+
+    @TypeConverter
+    fun gpsTypeToString(type: GpsActivityType): String = type.name
+
+    @TypeConverter
+    fun stringToGpsType(value: String): GpsActivityType =
+        runCatching { GpsActivityType.valueOf(value) }.getOrDefault(GpsActivityType.RUN)
 }
