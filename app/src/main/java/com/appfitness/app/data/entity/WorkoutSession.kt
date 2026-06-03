@@ -21,6 +21,8 @@ data class WorkoutSession(
     val energyBefore: Int? = null,
     val energyAfter: Int? = null,
     val note: String = "",
+    /** Set when this session belongs to a [TrainingProgram]. */
+    val programId: Long? = null,
 ) {
     val isCompleted: Boolean get() = endedAt != null
 }

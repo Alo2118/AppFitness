@@ -36,6 +36,10 @@ interface WorkoutDao {
     fun observeSessionWithSets(id: Long): Flow<SessionWithSets?>
 
     @Transaction
+    @Query("SELECT * FROM workout_sessions WHERE id = :id")
+    suspend fun getSessionWithSets(id: Long): SessionWithSets?
+
+    @Transaction
     @Query("SELECT * FROM workout_sessions WHERE endedAt IS NOT NULL ORDER BY startedAt DESC")
     fun observeCompletedSessions(): Flow<List<SessionWithSets>>
 

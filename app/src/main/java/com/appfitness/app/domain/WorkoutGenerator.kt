@@ -61,6 +61,7 @@ object WorkoutGenerator {
         energy: Int?,
         library: List<Exercise>,
         random: Random = Random.Default,
+        loadMultiplier: Float = 1f,
     ): List<GeneratedExercise> {
         if (library.isEmpty()) return emptyList()
 
@@ -74,7 +75,7 @@ object WorkoutGenerator {
         val count = (durationMin / 5 + energyAdj).coerceIn(3, 8)
 
         val chosen = pickExercises(goal, count, library, random)
-        return chosen.map { prescribe(it, goal, level, energy) }
+        return chosen.map { prescribe(it, goal, level, energy, loadMultiplier) }
     }
 
     private fun pickExercises(
@@ -109,16 +110,23 @@ object WorkoutGenerator {
         goal: WorkoutGoal,
         level: FitnessLevel,
         energy: Int?,
+        loadMultiplier: Float,
     ): GeneratedExercise {
         val setDelta = when (level) {
             FitnessLevel.PRINCIPIANTE -> -1
             FitnessLevel.INTERMEDIO -> 0
             FitnessLevel.AVANZATO -> 1
         }
-        val sets = (exercise.defaultSets + setDelta).coerceIn(2, 6)
+        // High adaptive load adds a set; very low load removes one.
+        val loadSetDelta = when {
+            loadMultiplier >= 1.15f -> 1
+            loadMultiplier <= 0.85f -> -1
+            else -> 0
+        }
+        val sets = (exercise.defaultSets + setDelta + loadSetDelta).coerceIn(2, 6)
 
         val lowEnergy = energy != null && energy <= 2
-        val intensity = if (lowEnergy) 0.8f else 1f
+        val intensity = (if (lowEnergy) 0.8f else 1f) * loadMultiplier
 
         // Goal-driven rep/duration tuning.
         val reps = if (exercise.isTimeBased) 0 else run {

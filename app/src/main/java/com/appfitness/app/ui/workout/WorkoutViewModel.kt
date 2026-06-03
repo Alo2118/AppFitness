@@ -137,6 +137,9 @@ class WorkoutViewModel(
                     note = note,
                 )
             )
+            // Adaptive programming: if this session belongs to a program, adjust
+            // its load based on completion + post-workout energy.
+            current.programId?.let { repository.applyAdaptiveUpdate(it, sessionId) }
             onDone()
         }
     }

@@ -24,6 +24,7 @@ import com.appfitness.app.ui.exercises.ExerciseListScreen
 import com.appfitness.app.ui.history.HistoryScreen
 import com.appfitness.app.ui.home.HomeScreen
 import com.appfitness.app.ui.mood.MoodScreen
+import com.appfitness.app.ui.programs.ProgramsScreen
 import com.appfitness.app.ui.navigation.Routes
 import com.appfitness.app.ui.navigation.TopDestination
 import com.appfitness.app.ui.theme.AppFitnessTheme
@@ -90,6 +91,13 @@ fun AppFitnessApp() {
                         navController.navigate(Routes.workout(sessionId))
                     },
                     onOpenSession = { /* history detail lives in the History tab */ },
+                )
+            }
+            composable(TopDestination.PROGRAMS.route) {
+                ProgramsScreen(
+                    onStartSession = { sessionId ->
+                        navController.navigate(Routes.workout(sessionId))
+                    },
                 )
             }
             composable(TopDestination.HISTORY.route) { HistoryScreen() }

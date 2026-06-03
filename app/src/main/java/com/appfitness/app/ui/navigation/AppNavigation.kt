@@ -1,10 +1,12 @@
 package com.appfitness.app.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Mood
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.FitnessCenter
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Home
@@ -19,6 +21,7 @@ enum class TopDestination(
     val unselectedIcon: ImageVector,
 ) {
     HOME("home", "Home", Icons.Filled.Home, Icons.Outlined.Home),
+    PROGRAMS("programs", "Programmi", Icons.Filled.CalendarMonth, Icons.Outlined.CalendarMonth),
     HISTORY("history", "Storico", Icons.Filled.History, Icons.Outlined.History),
     MOOD("mood", "Umore", Icons.Filled.Mood, Icons.Outlined.Mood),
     EXERCISES("exercises", "Esercizi", Icons.Filled.FitnessCenter, Icons.Outlined.FitnessCenter),

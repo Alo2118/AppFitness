@@ -44,6 +44,14 @@ del benessere olistico ma con un'esecuzione semplice e offline-first.
 
 ## ✨ Funzionalità implementate
 
+- **Test di inizio** — un assessment iniziale (push-up, squat in 60s, plank)
+  calcola il **livello di partenza** e il carico di base per i programmi.
+- **Programmi per sport specifico** — piani multi-settimana per Pallavolo,
+  Ciclismo, Fitness, Calcio, Running, Nuoto, Tennis, Basket. Ogni sport alterna
+  obiettivi (forza/cardio/total body) coerenti con la disciplina.
+- **Programmazione adattiva** — dopo ogni sessione del programma il carico si
+  ricalibra automaticamente in base a **% serie completate + energia post-workout**:
+  progressione quando vai forte, scarico quando fai fatica, con suggerimento testuale.
 - **Generatore di percorsi completi** — scegli obiettivo (forza, cardio,
   dimagrimento, mobilità, total body), livello e durata: l'app costruisce un
   allenamento completo dalla libreria, adattando serie/ripetizioni/recupero e
