@@ -32,7 +32,7 @@ import com.appfitness.app.data.entity.WorkoutSession
         TrainingProgram::class, AssessmentResult::class, CardioAssessment::class,
         GpsActivity::class, GpsPoint::class, RewardEntry::class, AchievementUnlock::class,
     ],
-    version = 6,
+    version = 7,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)

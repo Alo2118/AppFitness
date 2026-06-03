@@ -22,4 +22,6 @@ data class Exercise(
     val defaultDurationSec: Int = 30,
     val defaultRestSec: Int = 60,
     val isCustom: Boolean = false,
+    /** Optional guide image bundled in assets, e.g. "exercises/squat.jpg". */
+    val imageAsset: String? = null,
 )

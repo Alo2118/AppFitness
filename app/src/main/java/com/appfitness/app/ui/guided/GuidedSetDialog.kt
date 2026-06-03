@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -64,6 +65,7 @@ fun GuidedSetDialog(
     age: Int = 30,
     repProfile: RepProfile = RepProfiles.DEFAULT,
     targetZone: HeartRateZone = HeartRateZone.AEROBICA,
+    imageAsset: String? = null,
 ) {
     val context = LocalContext.current
     val monitor = remember {
@@ -153,6 +155,17 @@ fun GuidedSetDialog(
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                 )
+                imageAsset?.let { asset ->
+                    Spacer(Modifier.height(12.dp))
+                    com.appfitness.app.ui.components.AssetImage(
+                        assetPath = asset,
+                        contentDescription = exerciseName,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp)
+                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp)),
+                    )
+                }
                 Spacer(Modifier.height(24.dp))
                 Text(
                     text = "$reps",

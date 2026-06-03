@@ -165,7 +165,7 @@ fun WorkoutScreen(
     }
 
     guidedSet?.let { set ->
-        val category = exercises.firstOrNull { it.id == set.exerciseId }?.category
+        val exercise = exercises.firstOrNull { it.id == set.exerciseId }
         GuidedSetDialog(
             exerciseName = set.exerciseName,
             targetReps = set.reps,
@@ -177,7 +177,8 @@ fun WorkoutScreen(
             },
             onCancel = { guidedSet = null },
             age = userAge,
-            repProfile = RepProfiles.forCategory(category),
+            repProfile = RepProfiles.forCategory(exercise?.category),
+            imageAsset = exercise?.imageAsset,
         )
     }
 }

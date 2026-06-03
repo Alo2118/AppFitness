@@ -1,0 +1,5 @@
+Immagini guida degli esercizi
+=============================
+Fonte: free-exercise-db (https://github.com/yuhonas/free-exercise-db)
+Licenza: pubblico dominio (The Unlicense).
+Le immagini sono usate come riferimento visivo per gli esercizi.

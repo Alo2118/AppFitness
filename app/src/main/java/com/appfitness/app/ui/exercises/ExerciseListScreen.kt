@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -87,6 +89,16 @@ fun ExerciseListScreen(
                                 .padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
+                            exercise.imageAsset?.let { asset ->
+                                com.appfitness.app.ui.components.AssetImage(
+                                    assetPath = asset,
+                                    contentDescription = exercise.name,
+                                    modifier = Modifier
+                                        .size(72.dp)
+                                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp)),
+                                )
+                                androidx.compose.foundation.layout.Spacer(Modifier.size(12.dp))
+                            }
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     exercise.name,
