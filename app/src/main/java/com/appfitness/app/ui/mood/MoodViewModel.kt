@@ -28,6 +28,7 @@ class MoodViewModel(private val repository: FitnessRepository) : ViewModel() {
                     note = note,
                 )
             )
+            repository.addReward("mood", com.appfitness.app.domain.ActivityRewardRules.moodCheckIn())
         }
     }
 

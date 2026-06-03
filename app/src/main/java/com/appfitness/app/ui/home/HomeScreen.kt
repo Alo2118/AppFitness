@@ -43,6 +43,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val totalPoints by viewModel.totalPoints.collectAsStateWithLifecycle()
     var showStartDialog by remember { mutableStateOf(false) }
     var showGenerateDialog by remember { mutableStateOf(false) }
 
@@ -99,6 +100,10 @@ fun HomeScreen(
 
             item {
                 GenerateCard(onClick = { showGenerateDialog = true })
+            }
+
+            item {
+                ProgressCard(totalPoints)
             }
 
             item {
@@ -172,6 +177,43 @@ private fun GenerateCard(onClick: () -> Unit) {
                 text = "Scegli obiettivo, livello e durata: costruiamo noi l'allenamento, adattato alla tua energia di oggi.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProgressCard(totalPoints: Int) {
+    val level = com.appfitness.app.domain.RewardLevels.levelFor(totalPoints)
+    val progress = com.appfitness.app.domain.RewardLevels.levelProgress(totalPoints)
+    val toNext = com.appfitness.app.domain.RewardLevels.pointsToNextLevel(totalPoints)
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    "🏆 Livello $level",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text("$totalPoints punti", style = MaterialTheme.typography.titleMedium)
+            }
+            androidx.compose.material3.LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+            )
+            Text(
+                "Ancora $toNext punti al livello ${level + 1}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp),
             )
         }
     }

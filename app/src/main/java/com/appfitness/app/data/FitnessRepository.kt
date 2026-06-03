@@ -6,12 +6,14 @@ import com.appfitness.app.data.dao.ExerciseDao
 import com.appfitness.app.data.dao.GpsDao
 import com.appfitness.app.data.dao.MoodDao
 import com.appfitness.app.data.dao.ProgramDao
+import com.appfitness.app.data.dao.RewardDao
 import com.appfitness.app.data.dao.WorkoutDao
 import com.appfitness.app.data.entity.AssessmentResult
 import com.appfitness.app.data.entity.CardioAssessment
 import com.appfitness.app.data.entity.Exercise
 import com.appfitness.app.data.entity.GpsActivity
 import com.appfitness.app.data.entity.GpsPoint
+import com.appfitness.app.data.entity.RewardEntry
 import com.appfitness.app.data.entity.MoodEntry
 import com.appfitness.app.data.entity.SetLog
 import com.appfitness.app.data.entity.TrainingProgram
@@ -24,7 +26,9 @@ import com.appfitness.app.domain.AdaptiveEngine
 import com.appfitness.app.domain.AssessmentEvaluator
 import com.appfitness.app.domain.GeneratedExercise
 import com.appfitness.app.domain.HrFitnessEvaluator
+import com.appfitness.app.domain.RewardEvent
 import com.appfitness.app.domain.SportProgramGenerator
+import com.appfitness.app.reward.RewardCenter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
@@ -40,6 +44,7 @@ class FitnessRepository(
     private val assessmentDao: AssessmentDao,
     private val cardioAssessmentDao: CardioAssessmentDao,
     private val gpsDao: GpsDao,
+    private val rewardDao: RewardDao,
 ) {
     // ----- Exercises -----
     val exercises: Flow<List<Exercise>> = exerciseDao.observeAll()
@@ -59,6 +64,7 @@ class FitnessRepository(
     fun completedSessions(): Flow<List<SessionWithSets>> = workoutDao.observeCompletedSessions()
     fun observeSession(id: Long): Flow<SessionWithSets?> = workoutDao.observeSessionWithSets(id)
     suspend fun getSession(id: Long) = workoutDao.getSession(id)
+    suspend fun getSessionWithSets(id: Long) = workoutDao.getSessionWithSets(id)
     suspend fun startSession(session: WorkoutSession): Long = workoutDao.insertSession(session)
 
     /**
@@ -105,6 +111,23 @@ class FitnessRepository(
     suspend fun addSet(set: SetLog): Long = workoutDao.insertSet(set)
     suspend fun updateSet(set: SetLog) = workoutDao.updateSet(set)
     suspend fun deleteSet(id: Long) = workoutDao.deleteSet(id)
+
+    // ----- Rewards (app-wide gamification) -----
+    val totalRewardPoints: Flow<Int> = rewardDao.observeTotalPoints()
+    fun recentRewards(limit: Int): Flow<List<RewardEntry>> = rewardDao.observeRecent(limit)
+
+    /** Persists a reward and broadcasts it for the celebratory UI + haptics. */
+    suspend fun addReward(source: String, event: RewardEvent) {
+        rewardDao.insert(
+            RewardEntry(
+                timestamp = System.currentTimeMillis(),
+                source = source,
+                label = event.title,
+                points = event.points,
+            )
+        )
+        RewardCenter.award(event)
+    }
 
     // ----- Mood -----
     val moodEntries: Flow<List<MoodEntry>> = moodDao.observeAll()

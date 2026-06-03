@@ -10,10 +10,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import com.appfitness.app.reward.RewardCenter
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -54,7 +60,17 @@ fun AppFitnessApp() {
 
     val showBottomBar = TopDestination.entries.any { it.route == currentRoute }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        RewardCenter.events.collect { event ->
+            rewardHaptic(context)
+            snackbarHostState.showSnackbar("🏆 ${event.title}  +${event.points}")
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             if (showBottomBar) {
                 NavigationBar {
@@ -139,5 +155,19 @@ fun AppFitnessApp() {
                 WorkoutScreen(onFinished = { navController.popBackStack() })
             }
         }
+    }
+}
+
+/** Short celebratory vibration when a reward is earned anywhere in the app. */
+private fun rewardHaptic(context: android.content.Context) {
+    val vibrator = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+        (context.getSystemService(android.content.Context.VIBRATOR_MANAGER_SERVICE)
+            as? android.os.VibratorManager)?.defaultVibrator
+    } else {
+        @Suppress("DEPRECATION")
+        context.getSystemService(android.content.Context.VIBRATOR_SERVICE) as? android.os.Vibrator
+    }
+    runCatching {
+        vibrator?.vibrate(android.os.VibrationEffect.createOneShot(120, android.os.VibrationEffect.DEFAULT_AMPLITUDE))
     }
 }

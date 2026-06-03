@@ -302,6 +302,11 @@ class TrackingService : Service() {
                 )
             } else null
 
+            // Fold the session's in-session score into the app-wide reward ledger.
+            if (distance > 0) {
+                repo.addReward("gps", com.appfitness.app.domain.ActivityRewardRules.gpsSession(rewards.totalScore))
+            }
+
             TrackingState.lastSavedActivityId.value = savedId
             TrackingState.isTracking.value = false
             delay(2500) // let the spoken summary finish before tearing down TTS

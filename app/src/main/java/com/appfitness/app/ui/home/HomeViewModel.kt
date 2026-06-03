@@ -41,6 +41,12 @@ class HomeViewModel(private val repository: FitnessRepository) : ViewModel() {
             initialValue = HomeUiState(),
         )
 
+    val totalPoints: StateFlow<Int> = repository.totalRewardPoints.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = 0,
+    )
+
     /** Creates a new in-progress session and returns its id via [onCreated]. */
     fun startWorkout(title: String, moodBefore: Int?, energyBefore: Int?, onCreated: (Long) -> Unit) {
         viewModelScope.launch {

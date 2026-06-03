@@ -146,7 +146,27 @@ class WorkoutViewModel(
             // Adaptive programming: if this session belongs to a program, adjust
             // its load based on completion + post-workout energy.
             current.programId?.let { repository.applyAdaptiveUpdate(it, sessionId) }
+
+            // Reward the completed workout (app-wide dopamine system).
+            val sets = repository.getSessionWithSets(sessionId)?.sets.orEmpty()
+            val completed = sets.count { it.completed }
+            val volume = sets.filter { it.completed }
+                .sumOf { (it.reps * it.weightKg).toDouble() }.toFloat()
+            val moodDelta = if (moodAfter != null && current.moodBefore != null) {
+                moodAfter - current.moodBefore
+            } else null
+            repository.addReward(
+                "workout",
+                com.appfitness.app.domain.ActivityRewardRules.workout(completed, volume, moodDelta),
+            )
             onDone()
+        }
+    }
+
+    /** Rewards a guided set when it ends (immediate dopamine during strength work). */
+    fun awardGuidedSet(reps: Int, target: Int) {
+        viewModelScope.launch {
+            repository.addReward("guided", com.appfitness.app.domain.ActivityRewardRules.guidedSet(reps, target))
         }
     }
 

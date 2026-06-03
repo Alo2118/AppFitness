@@ -11,6 +11,7 @@ import com.appfitness.app.data.dao.ExerciseDao
 import com.appfitness.app.data.dao.GpsDao
 import com.appfitness.app.data.dao.MoodDao
 import com.appfitness.app.data.dao.ProgramDao
+import com.appfitness.app.data.dao.RewardDao
 import com.appfitness.app.data.dao.WorkoutDao
 import com.appfitness.app.data.entity.AssessmentResult
 import com.appfitness.app.data.entity.CardioAssessment
@@ -18,6 +19,7 @@ import com.appfitness.app.data.entity.Exercise
 import com.appfitness.app.data.entity.GpsActivity
 import com.appfitness.app.data.entity.GpsPoint
 import com.appfitness.app.data.entity.MoodEntry
+import com.appfitness.app.data.entity.RewardEntry
 import com.appfitness.app.data.entity.SetLog
 import com.appfitness.app.data.entity.TrainingProgram
 import com.appfitness.app.data.entity.WorkoutSession
@@ -26,9 +28,9 @@ import com.appfitness.app.data.entity.WorkoutSession
     entities = [
         Exercise::class, WorkoutSession::class, SetLog::class, MoodEntry::class,
         TrainingProgram::class, AssessmentResult::class, CardioAssessment::class,
-        GpsActivity::class, GpsPoint::class,
+        GpsActivity::class, GpsPoint::class, RewardEntry::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)
@@ -41,6 +43,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun assessmentDao(): AssessmentDao
     abstract fun cardioAssessmentDao(): CardioAssessmentDao
     abstract fun gpsDao(): GpsDao
+    abstract fun rewardDao(): RewardDao
 
     companion object {
         @Volatile

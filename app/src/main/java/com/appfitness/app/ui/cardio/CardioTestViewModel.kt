@@ -96,6 +96,7 @@ class CardioTestViewModel(
                 recoveryHr = recovery,
                 deviceName = deviceName.value.orEmpty(),
             )
+            repository.addReward("cardio", com.appfitness.app.domain.ActivityRewardRules.cardioTest())
             _phase.value = CardioPhase.RESULT
         }
     }

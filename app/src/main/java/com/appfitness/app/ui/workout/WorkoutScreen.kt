@@ -171,6 +171,7 @@ fun WorkoutScreen(
             targetReps = set.reps,
             onDone = { actualReps ->
                 viewModel.updateSet(set.copy(reps = actualReps, completed = true))
+                viewModel.awardGuidedSet(actualReps, set.reps)
                 if (set.restSec > 0) viewModel.startRest(set.restSec)
                 guidedSet = null
             },

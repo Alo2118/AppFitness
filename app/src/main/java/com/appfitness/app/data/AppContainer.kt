@@ -22,6 +22,7 @@ class DefaultAppContainer(context: Context) : AppContainer {
             assessmentDao = database.assessmentDao(),
             cardioAssessmentDao = database.cardioAssessmentDao(),
             gpsDao = database.gpsDao(),
+            rewardDao = database.rewardDao(),
         )
     }
 

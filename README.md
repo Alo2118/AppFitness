@@ -59,6 +59,11 @@ del benessere olistico ma con un'esecuzione semplice e offline-first.
     **bonus a sorpresa** a rapporto variabile, **traguardi** di distanza, sorpasso
     del fantasma, minuti in zona e **record personali** — con celebrazione
     **vocale + vibrazione + banner animato**.
+- **Ricompense su tutte le attività + progressione**: ogni attività (allenamenti
+  di forza, serie guidate, programmi, test cardio, check-in umore e sessioni GPS)
+  assegna **punti** in un sistema condiviso e persistente. Ovunque guadagni punti
+  appare una **celebrazione (snackbar + vibrazione)**; la Home mostra **livello,
+  punti totali e progressi** verso il livello successivo.
   - **Coach vocale (corsa e bici), calibrato sulla performance**: interviene solo
     quando serve — **battito fuori dalla zona target** (in base all'età; con
     battito alto dà la **guida alla respirazione**), **molto lontano
