@@ -49,10 +49,12 @@ del benessere olistico ma con un'esecuzione semplice e offline-first.
   spento) e gareggia contro un **fantasma**: una **sessione precedente**, un
   **ritmo costante** o un **tempo obiettivo** da battere. In tempo reale mostra se
   sei *avanti* o *indietro* e di quanti metri.
-  - **Coach vocale durante la corsa**: avvisi parlati sullo **stato rispetto
-    all'obiettivo** (a ogni km: ritmo + distacco dal fantasma), **aiuti per
-    tenere il ritmo** ("accelera"/"puoi rallentare") e **guida alla respirazione**
-    quando rileva difficoltà (battito alto, ritmo che crolla o distacco crescente).
+  - **Coach vocale (corsa e bici), calibrato sulla performance**: interviene solo
+    quando serve — **battito fuori dalla zona target** (in base all'età; con
+    battito alto dà la **guida alla respirazione**), **molto lontano
+    dall'obiettivo**, o **ritmo perso** — mentre quando va tutto bene dà un
+    feedback **ogni 1 km**. Messaggi e unità si adattano all'attività: **ritmo
+    (min/km) per la corsa**, **velocità (km/h) per la bici**.
 - **Test di inizio** — un assessment iniziale (push-up, squat in 60s, plank)
   calcola il **livello di partenza** e il carico di base per i programmi.
 - **Test cardio con cardiofrequenzimetro** — collega una fascia/orologio

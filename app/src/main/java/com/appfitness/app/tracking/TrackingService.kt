@@ -27,10 +27,12 @@ import com.appfitness.app.data.model.GpsActivityType
 import com.appfitness.app.domain.Ghost
 import com.appfitness.app.domain.GhostComparator
 import com.appfitness.app.domain.Ghosts
+import com.appfitness.app.domain.HeartRateZone
 import com.appfitness.app.domain.RouteSample
 import com.appfitness.app.domain.RouteTracker
 import com.appfitness.app.domain.RunCoachEngine
 import com.appfitness.app.domain.RunState
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -60,6 +62,7 @@ class TrackingService : Service() {
     private var speech: SpeechCoach? = null
     private var monitor: HeartRateMonitor? = null
     private var targetPaceSecPerKm: Double? = null
+    private var userAge: Int = 30
 
     private val listener = LocationListener { location -> onLocation(location) }
 
@@ -89,7 +92,11 @@ class TrackingService : Service() {
         configureGhost(intent)
         startForegroundNotification()
         requestUpdates()
-        speech?.speak(coach.startPhrase(targetPaceSecPerKm))
+        speech?.speak(coach.startPhrase(type, targetPaceSecPerKm))
+        scope.launch {
+            userAge = (application as AppFitnessApplication).container.repository
+                .latestCardioAssessment.first()?.age ?: 30
+        }
 
         tickJob?.cancel()
         tickJob = scope.launch {
@@ -132,15 +139,17 @@ class TrackingService : Service() {
 
     /** Builds the current run state and speaks any coaching cue. */
     private fun speakCoaching(elapsed: Int) {
-        val hr = monitor?.heartRate?.value
         val cue = coach.onUpdate(
             RunState(
+                activityType = type,
                 elapsedSec = elapsed,
                 distanceM = tracker.totalDistanceM,
                 currentPaceSecPerKm = tracker.currentPaceSecPerKm(),
                 targetPaceSecPerKm = targetPaceSecPerKm,
                 ghostLeadM = TrackingState.ghostLeadM.value,
-                heartRateElevated = hr != null && hr >= HR_ELEVATED_BPM,
+                heartRate = monitor?.heartRate?.value,
+                age = userAge,
+                targetZone = HeartRateZone.AEROBICA,
             )
         )
         cue?.let { speech?.speak(it) }
@@ -269,7 +278,6 @@ class TrackingService : Service() {
     companion object {
         private const val CHANNEL_ID = "gps_tracking"
         private const val NOTIFICATION_ID = 42
-        private const val HR_ELEVATED_BPM = 150
 
         const val ACTION_START = "com.appfitness.app.action.START_TRACKING"
         const val ACTION_STOP = "com.appfitness.app.action.STOP_TRACKING"

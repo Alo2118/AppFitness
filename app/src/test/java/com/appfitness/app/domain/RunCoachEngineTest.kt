@@ -1,82 +1,96 @@
 package com.appfitness.app.domain
 
+import com.appfitness.app.data.model.GpsActivityType
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+private fun run(
+    elapsedSec: Int,
+    distanceM: Double,
+    pace: Double,
+    target: Double? = null,
+    ghostLead: Double? = null,
+    hr: Int? = null,
+    age: Int = 30,
+) = RunState(
+    activityType = GpsActivityType.RUN,
+    elapsedSec = elapsedSec,
+    distanceM = distanceM,
+    currentPaceSecPerKm = pace,
+    targetPaceSecPerKm = target,
+    ghostLeadM = ghostLead,
+    heartRate = hr,
+    age = age,
+)
+
 class RunCoachEngineTest {
 
     @Test
-    fun `start phrase mentions target pace when set`() {
+    fun `start phrase adapts to activity and mentions target`() {
         val engine = RunCoachEngine()
-        assertTrue(engine.startPhrase(330.0).contains("5:30"))
-        assertTrue(engine.startPhrase(null).isNotBlank())
+        assertTrue(engine.startPhrase(GpsActivityType.BIKE, null).contains("pedalata"))
+        assertTrue(engine.startPhrase(GpsActivityType.RUN, 330.0).contains("5:30"))
     }
 
     @Test
-    fun `announces each kilometre once`() {
+    fun `announces each kilometre once when all is well`() {
         val engine = RunCoachEngine()
-        val first = engine.onUpdate(RunState(elapsedSec = 300, distanceM = 1000.0, currentPaceSecPerKm = 300.0))
+        val first = engine.onUpdate(run(300, 1000.0, 300.0))
         assertNotNull(first)
         assertTrue(first!!.contains("1 chilometro"))
-        // Still in the first km -> no repeat.
-        val again = engine.onUpdate(RunState(elapsedSec = 305, distanceM = 1010.0, currentPaceSecPerKm = 300.0))
-        assertNull(again)
-        // Second km announced.
-        val second = engine.onUpdate(RunState(elapsedSec = 600, distanceM = 2000.0, currentPaceSecPerKm = 300.0))
-        assertNotNull(second)
+        assertNull(engine.onUpdate(run(305, 1010.0, 300.0)))
+        val second = engine.onUpdate(run(600, 2000.0, 300.0))
         assertTrue(second!!.contains("2 chilometri"))
     }
 
     @Test
-    fun `milestone reports ghost status`() {
-        val engine = RunCoachEngine()
-        val ahead = engine.onUpdate(
-            RunState(elapsedSec = 300, distanceM = 1000.0, currentPaceSecPerKm = 300.0, ghostLeadM = 30.0),
-        )
-        assertNotNull(ahead)
-        assertTrue(ahead!!.contains("avanti"))
-    }
-
-    @Test
-    fun `gives breathing guidance when heart rate is high`() {
+    fun `bike kilometre status uses speed in km per hour`() {
         val engine = RunCoachEngine()
         val cue = engine.onUpdate(
-            RunState(elapsedSec = 45, distanceM = 200.0, currentPaceSecPerKm = 360.0, heartRateElevated = true),
+            RunState(GpsActivityType.BIKE, elapsedSec = 120, distanceM = 1000.0, currentPaceSecPerKm = 120.0),
         )
         assertNotNull(cue)
-        assertTrue(cue!!.lowercase().contains("respir"))
+        assertTrue(cue!!.contains("orari")) // 120 s/km == 30.0 km/h
     }
 
     @Test
-    fun `nudges to accelerate when behind target pace`() {
+    fun `intervenes when heart rate is above the target zone`() {
         val engine = RunCoachEngine()
-        val cue = engine.onUpdate(
-            RunState(elapsedSec = 30, distanceM = 100.0, currentPaceSecPerKm = 360.0, targetPaceSecPerKm = 330.0),
-        )
+        // age 30 -> maxHr 190; 185 ~ 97% -> well above AEROBICA target.
+        val cue = engine.onUpdate(run(40, 150.0, 360.0, hr = 185))
+        assertNotNull(cue)
+        assertTrue(cue!!.lowercase().contains("battito"))
+    }
+
+    @Test
+    fun `intervenes when far behind the ghost`() {
+        val engine = RunCoachEngine()
+        val cue = engine.onUpdate(run(40, 150.0, 360.0, ghostLead = -120.0))
+        assertNotNull(cue)
+        assertTrue(cue!!.contains("indietro"))
+    }
+
+    @Test
+    fun `nudges to accelerate when losing target pace`() {
+        val engine = RunCoachEngine()
+        val cue = engine.onUpdate(run(40, 150.0, 345.0, target = 330.0))
         assertNotNull(cue)
         assertTrue(cue!!.lowercase().contains("accelera"))
     }
 
     @Test
-    fun `stays quiet when on pace and not in a new km`() {
+    fun `stays quiet mid-kilometre when everything is on track`() {
         val engine = RunCoachEngine()
-        val cue = engine.onUpdate(
-            RunState(elapsedSec = 30, distanceM = 100.0, currentPaceSecPerKm = 330.0, targetPaceSecPerKm = 330.0),
-        )
-        assertNull(cue)
+        assertNull(engine.onUpdate(run(40, 150.0, 330.0, target = 330.0, hr = 150)))
     }
 
     @Test
-    fun `pace nudge is throttled within the same window`() {
+    fun `interventions are throttled within their window`() {
         val engine = RunCoachEngine()
-        val first = engine.onUpdate(
-            RunState(elapsedSec = 30, distanceM = 100.0, currentPaceSecPerKm = 360.0, targetPaceSecPerKm = 330.0),
-        )
-        val same = engine.onUpdate(
-            RunState(elapsedSec = 35, distanceM = 110.0, currentPaceSecPerKm = 360.0, targetPaceSecPerKm = 330.0),
-        )
+        val first = engine.onUpdate(run(30, 100.0, 345.0, target = 330.0))
+        val same = engine.onUpdate(run(35, 110.0, 345.0, target = 330.0))
         assertNotNull(first)
         assertNull(same)
     }
