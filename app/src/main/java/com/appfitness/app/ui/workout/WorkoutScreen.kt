@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.appfitness.app.data.entity.SetLog
+import com.appfitness.app.domain.RepProfiles
 import com.appfitness.app.ui.AppViewModelProvider
 import com.appfitness.app.ui.exercises.ExerciseViewModel
 import com.appfitness.app.ui.guided.GuidedSetDialog
@@ -56,6 +57,7 @@ fun WorkoutScreen(
     val elapsed by viewModel.elapsedSec.collectAsStateWithLifecycle()
     val rest by viewModel.rest.collectAsStateWithLifecycle()
     val exercises by exerciseViewModel.exercises.collectAsStateWithLifecycle()
+    val userAge by viewModel.userAge.collectAsStateWithLifecycle()
 
     var showPicker by remember { mutableStateOf(false) }
     var showFinish by remember { mutableStateOf(false) }
@@ -163,6 +165,7 @@ fun WorkoutScreen(
     }
 
     guidedSet?.let { set ->
+        val category = exercises.firstOrNull { it.id == set.exerciseId }?.category
         GuidedSetDialog(
             exerciseName = set.exerciseName,
             targetReps = set.reps,
@@ -172,6 +175,8 @@ fun WorkoutScreen(
                 guidedSet = null
             },
             onCancel = { guidedSet = null },
+            age = userAge,
+            repProfile = RepProfiles.forCategory(category),
         )
     }
 }

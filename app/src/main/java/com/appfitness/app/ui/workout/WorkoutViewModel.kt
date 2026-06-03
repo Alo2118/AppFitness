@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -44,6 +45,11 @@ class WorkoutViewModel(
 
     private val _rest = MutableStateFlow(RestTimerState())
     val rest: StateFlow<RestTimerState> = _rest.asStateFlow()
+
+    /** User's age (from the latest cardio test) for heart-rate zone calculations. */
+    val userAge: StateFlow<Int> = repository.latestCardioAssessment
+        .map { it?.age ?: 30 }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 30)
 
     private var restJob: Job? = null
     private var startedAt: Long = 0L

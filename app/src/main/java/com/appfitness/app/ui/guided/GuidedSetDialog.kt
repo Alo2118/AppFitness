@@ -39,6 +39,11 @@ import com.appfitness.app.ble.HeartRateMonitor
 import com.appfitness.app.ble.HrConnectionState
 import com.appfitness.app.domain.CoachingEngine
 import com.appfitness.app.domain.CoachingState
+import com.appfitness.app.domain.HeartRateZone
+import com.appfitness.app.domain.HeartRateZoneEvaluator
+import com.appfitness.app.domain.RepProfile
+import com.appfitness.app.domain.RepProfiles
+import com.appfitness.app.domain.ZoneAlerter
 import com.appfitness.app.sensor.SensorRepCounter
 import kotlinx.coroutines.delay
 
@@ -56,14 +61,18 @@ fun GuidedSetDialog(
     targetReps: Int,
     onDone: (actualReps: Int) -> Unit,
     onCancel: () -> Unit,
+    age: Int = 30,
+    repProfile: RepProfile = RepProfiles.DEFAULT,
+    targetZone: HeartRateZone = HeartRateZone.AEROBICA,
 ) {
     val context = LocalContext.current
     val monitor = remember {
         (context.applicationContext as AppFitnessApplication).container.heartRateMonitor
     }
-    val counter = remember { SensorRepCounter(context) }
+    val counter = remember(repProfile) { SensorRepCounter(context, repProfile) }
     val coach = remember { SpeechCoach(context) }
     val engine = remember { CoachingEngine() }
+    val zoneAlerter = remember(targetZone) { ZoneAlerter(targetZone) }
 
     val reps by counter.reps.collectAsStateWithLifecycle()
     val cadence by counter.cadence.collectAsStateWithLifecycle()
@@ -72,6 +81,8 @@ fun GuidedSetDialog(
 
     var message by remember { mutableStateOf("Preparati…") }
     var initialCadence by remember { mutableFloatStateOf(0f) }
+
+    val currentZone = hr?.let { HeartRateZoneEvaluator.zoneFor(it, age) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
@@ -103,6 +114,13 @@ fun GuidedSetDialog(
             heartRateElevated = hr != null && hr!! >= HR_ELEVATED_BPM,
         )
         engine.onUpdate(state)?.let { message = it; coach.speak(it) }
+    }
+
+    // Live heart-rate zone alerts: speak only when crossing the target zone.
+    LaunchedEffect(currentZone) {
+        currentZone?.let { zone ->
+            zoneAlerter.onZone(zone)?.let { message = it; coach.speak(it) }
+        }
     }
 
     // Completion: announce, then hand the actual count back.
@@ -149,6 +167,16 @@ fun GuidedSetDialog(
                     text = hr?.let { "❤️ $it bpm" } ?: "Fascia non collegata",
                     style = MaterialTheme.typography.bodyLarge,
                 )
+                currentZone?.let { zone ->
+                    val inTarget = zone == targetZone
+                    Text(
+                        text = "Zona: ${zone.label}${if (inTarget) " ✔ (target)" else " · target ${targetZone.label}"}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = if (inTarget) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.error,
+                    )
+                }
                 if (hrState != HrConnectionState.CONNECTED) {
                     OutlinedButton(
                         onClick = {

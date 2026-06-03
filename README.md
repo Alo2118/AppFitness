@@ -64,6 +64,11 @@ del benessere olistico ma con un'esecuzione semplice e offline-first.
   battito alto) e ti spinge — *"Forza, ancora 2 ripetizioni!"* — fino a
   completare la serie, salvando il conteggio effettivo. Conteggio manuale di
   riserva se l'accelerometro non rileva.
+  - **Soglie adattive per esercizio**: il rilevatore di ripetizioni si calibra
+    sul tipo di movimento (forza ampio/lento, core piccolo, cardio esplosivo).
+  - **Zone di frequenza cardiaca live**: mostra la zona corrente (Riposo →
+    Massimale) rispetto alla zona target e **avvisa a voce** quando ne esci
+    ("Aumenta il ritmo" / "Rallenta"), in base alla FCmax stimata dall'età.
 - **Generatore di percorsi completi** — scegli obiettivo (forza, cardio,
   dimagrimento, mobilità, total body), livello e durata: l'app costruisce un
   allenamento completo dalla libreria, adattando serie/ripetizioni/recupero e

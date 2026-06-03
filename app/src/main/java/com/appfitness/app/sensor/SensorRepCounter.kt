@@ -6,6 +6,8 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import com.appfitness.app.domain.RepDetector
+import com.appfitness.app.domain.RepProfile
+import com.appfitness.app.domain.RepProfiles
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,14 +18,21 @@ import kotlin.math.sqrt
  * wrist), delegating the signal processing to [RepDetector]. Also estimates the
  * current cadence (reps/min) so the coaching layer can detect slowing down.
  */
-class SensorRepCounter(context: Context) : SensorEventListener {
+class SensorRepCounter(
+    context: Context,
+    profile: RepProfile = RepProfiles.DEFAULT,
+) : SensorEventListener {
 
     private val sensorManager =
         context.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
     private val accelerometer: Sensor? =
         sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
-    private val detector = RepDetector()
+    private val detector = RepDetector(
+        highThreshold = profile.highThreshold,
+        lowThreshold = profile.lowThreshold,
+        minRepIntervalMs = profile.minRepIntervalMs,
+    )
     private val recentRepTimes = ArrayDeque<Long>()
 
     private val _reps = MutableStateFlow(0)
