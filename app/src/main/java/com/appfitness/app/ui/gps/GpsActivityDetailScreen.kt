@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import android.content.Intent
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,7 +17,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -48,23 +46,15 @@ fun GpsActivityDetailScreen(activityId: Long, onBack: () -> Unit) {
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Dettaglio attività") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
-                    }
-                },
-                actions = {
-                    data?.let { d ->
-                        if (d.points.isNotEmpty()) {
-                            IconButton(onClick = { shareGpx(context, d) }) {
-                                Icon(Icons.Filled.Share, contentDescription = "Esporta GPX")
-                            }
+            com.appfitness.app.ui.components.BackTopBar("Dettaglio attività", onBack) {
+                data?.let { d ->
+                    if (d.points.isNotEmpty()) {
+                        IconButton(onClick = { shareGpx(context, d) }) {
+                            Icon(Icons.Filled.Share, contentDescription = "Esporta GPX")
                         }
                     }
-                },
-            )
+                }
+            }
         },
     ) { padding ->
         val activity = data?.activity

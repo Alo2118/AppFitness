@@ -34,6 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.appfitness.app.data.model.MoodLevel
 import com.appfitness.app.data.relation.SessionWithSets
 import com.appfitness.app.ui.AppViewModelProvider
+import com.appfitness.app.ui.components.ActionCard
 import com.appfitness.app.ui.components.EmptyHint
 import com.appfitness.app.ui.components.SectionTitle
 import com.appfitness.app.ui.components.StatTile
@@ -96,11 +97,21 @@ fun HomeScreen(
             }
 
             item {
-                GenerateCard(onClick = { showGenerateDialog = true })
+                ActionCard(
+                    title = "✨ Genera un percorso completo",
+                    subtitle = "Scegli obiettivo, livello e durata: costruiamo noi l'allenamento, adattato alla tua energia di oggi.",
+                    container = MaterialTheme.colorScheme.tertiaryContainer,
+                    onClick = { showGenerateDialog = true },
+                )
             }
 
             item {
-                GpsCard(onClick = onOpenGps)
+                ActionCard(
+                    title = "🏃 Corsa & Bici (GPS)",
+                    subtitle = "Traccia il percorso e sfida un fantasma: una tua sessione, un ritmo costante o un tempo da battere.",
+                    container = MaterialTheme.colorScheme.secondaryContainer,
+                    onClick = onOpenGps,
+                )
             }
 
             item {
@@ -139,30 +150,6 @@ fun HomeScreen(
                 viewModel.startGenerated(title, mood, energy, plan, onStartWorkout)
             },
         )
-    }
-}
-
-@Composable
-private fun GenerateCard(onClick: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onClick,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-        ),
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "✨ Genera un percorso completo",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Text(
-                text = "Scegli obiettivo, livello e durata: costruiamo noi l'allenamento, adattato alla tua energia di oggi.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
     }
 }
 
@@ -237,29 +224,6 @@ private fun HeroHeader(totalPoints: Int, onClick: () -> Unit) {
     }
 }
 
-@Composable
-private fun GpsCard(onClick: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onClick,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        ),
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "🏃 Corsa & Bici (GPS)",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Text(
-                text = "Traccia il percorso e sfida un fantasma: una tua sessione, un ritmo costante o un tempo da battere.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
 
 @Composable
 private fun RecentSessionCard(session: SessionWithSets, onClick: () -> Unit) {

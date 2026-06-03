@@ -1,12 +1,19 @@
 package com.appfitness.app.ui.components
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +39,52 @@ fun EmptyHint(text: String, modifier: Modifier = Modifier) {
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = modifier,
+    )
+}
+
+/** Tappable card with a title and a description — the app's standard entry card. */
+@Composable
+fun ActionCard(
+    title: String,
+    subtitle: String,
+    modifier: Modifier = Modifier,
+    container: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primaryContainer,
+    onClick: (() -> Unit)? = null,
+) {
+    val colors = CardDefaults.cardColors(containerColor = container)
+    val content: @Composable () -> Unit = {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(
+                subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+    if (onClick != null) {
+        Card(onClick = onClick, modifier = modifier.fillMaxWidth(), colors = colors) { content() }
+    } else {
+        Card(modifier = modifier.fillMaxWidth(), colors = colors) { content() }
+    }
+}
+
+/** Standard top bar with a back button and optional [actions]. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BackTopBar(
+    title: String,
+    onBack: () -> Unit,
+    actions: @Composable RowScope.() -> Unit = {},
+) {
+    TopAppBar(
+        title = { Text(title) },
+        navigationIcon = {
+            IconButton(onClick = onBack) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+            }
+        },
+        actions = actions,
     )
 }
 
