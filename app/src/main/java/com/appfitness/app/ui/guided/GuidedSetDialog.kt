@@ -157,7 +157,7 @@ fun GuidedSetDialog(
                 )
                 imageAsset?.let { asset ->
                     Spacer(Modifier.height(12.dp))
-                    com.appfitness.app.ui.components.AssetImage(
+                    com.appfitness.app.ui.components.AnimatedExerciseImage(
                         assetPath = asset,
                         contentDescription = exerciseName,
                         modifier = Modifier

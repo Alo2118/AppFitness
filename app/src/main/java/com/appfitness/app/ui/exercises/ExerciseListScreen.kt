@@ -90,7 +90,7 @@ fun ExerciseListScreen(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             exercise.imageAsset?.let { asset ->
-                                com.appfitness.app.ui.components.AssetImage(
+                                com.appfitness.app.ui.components.AnimatedExerciseImage(
                                     assetPath = asset,
                                     contentDescription = exercise.name,
                                     modifier = Modifier

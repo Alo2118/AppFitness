@@ -104,12 +104,13 @@ del benessere olistico ma con un'esecuzione semplice e offline-first.
   allenamento completo dalla libreria, adattando serie/ripetizioni/recupero e
   **modulando l'intensità in base all'energia del giorno**. Anteprima, "rigenera"
   e avvio in un tap.
-- **Libreria esercizi con immagini guida** — 12 esercizi pre-caricati (forza,
-  cardio, core, mobilità, total body) filtrabili per categoria, ciascuno con
-  un'**immagine guida** (bundle offline, di pubblico dominio da
-  [free-exercise-db](https://github.com/yuhonas/free-exercise-db)), mostrata nella
-  libreria, nel selettore durante l'allenamento e nella modalità guidata. Più
-  creazione di esercizi personalizzati.
+- **Libreria esercizi con immagini guida animate** — 12 esercizi pre-caricati
+  (forza, cardio, core, mobilità, total body) filtrabili per categoria, ciascuno
+  con un'**anteprima animata a 2 frame** (posizione iniziale ⇄ finale, in
+  dissolvenza) che suggerisce il movimento; immagini di pubblico dominio da
+  [free-exercise-db](https://github.com/yuhonas/free-exercise-db), bundle offline.
+  L'animazione appare nella libreria e nella modalità guidata. Più creazione di
+  esercizi personalizzati.
 - **Sessione di allenamento** con:
   - **Cronometro** della sessione sempre visibile.
   - **Timer di recupero** automatico tra le serie (con +15s / −15s / salta).
