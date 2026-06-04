@@ -56,6 +56,11 @@ fun ExerciseListScreen(
         },
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
+            com.appfitness.app.ui.components.ScreenHeader(
+                title = "Esercizi",
+                subtitle = "Sfoglia la libreria con le guide animate o crea i tuoi.",
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
+            )
             LazyRow(
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),

@@ -67,12 +67,14 @@ fun MoodScreen(
             }
 
             if (entries.isNotEmpty()) {
+                item { com.appfitness.app.ui.components.SectionTitle("Andamento", modifier = Modifier.padding(top = 4.dp)) }
                 item { MoodTrend(entries.take(10).reversed()) }
             }
 
             if (entries.isEmpty()) {
                 item { com.appfitness.app.ui.components.EmptyHint("Nessuna registrazione. Tocca + per il tuo primo check-in.") }
             } else {
+                item { com.appfitness.app.ui.components.SectionTitle("Registrazioni", modifier = Modifier.padding(top = 8.dp)) }
                 items(entries, key = { it.id }) { entry ->
                     MoodCard(entry, onDelete = { viewModel.delete(entry.id) })
                 }

@@ -78,6 +78,10 @@ fun ProgramsScreen(
                 )
             }
 
+            item {
+                com.appfitness.app.ui.components.SectionTitle("Valutazioni", modifier = Modifier.padding(top = 4.dp))
+            }
+
             item { AssessmentCard(assessment) { showAssessment = true } }
 
             item { CardioCard(cardio, onTest = onOpenCardioTest) }
@@ -85,7 +89,7 @@ fun ProgramsScreen(
             item {
                 com.appfitness.app.ui.components.SectionTitle(
                     "I tuoi programmi",
-                    modifier = Modifier.padding(top = 4.dp),
+                    modifier = Modifier.padding(top = 8.dp),
                 )
             }
 
