@@ -51,20 +51,12 @@ fun AchievementsScreen(
         ) {
             item { HeaderCard(state.level, state.totalPoints, state.streak) }
 
-            item {
-                Text(
-                    "Obiettivi della settimana",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
+            item { com.appfitness.app.ui.components.SectionTitle("Obiettivi della settimana") }
             items(state.weeklyGoals, key = { it.key }) { goal -> WeeklyGoalRow(goal) }
 
             item {
-                Text(
+                com.appfitness.app.ui.components.SectionTitle(
                     "Badge (${state.badges.count { it.unlocked }}/${state.badges.size})",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(top = 8.dp),
                 )
             }
@@ -75,14 +67,9 @@ fun AchievementsScreen(
 
 @Composable
 private fun HeaderCard(level: Int, points: Int, streak: Int) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
-    ) {
+    com.appfitness.app.ui.components.GradientHeader {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround,
         ) {
             Stat("🏆", "Livello $level")
@@ -96,7 +83,12 @@ private fun HeaderCard(level: Int, points: Int, streak: Int) {
 private fun Stat(emoji: String, label: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(emoji, fontSize = 28.sp)
-        Text(label, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+        Text(
+            label,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = androidx.compose.ui.graphics.Color.White,
+        )
     }
 }
 

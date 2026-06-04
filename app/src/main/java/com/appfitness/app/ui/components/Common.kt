@@ -1,9 +1,14 @@
 package com.appfitness.app.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
@@ -17,8 +22,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.appfitness.app.ui.theme.appGradient
 
 /** Reusable design-system building blocks shared across screens. */
 
@@ -66,6 +73,23 @@ fun ActionCard(
         Card(onClick = onClick, modifier = modifier.fillMaxWidth(), colors = colors) { content() }
     } else {
         Card(modifier = modifier.fillMaxWidth(), colors = colors) { content() }
+    }
+}
+
+/** Rounded brand-gradient header surface with white-on-gradient content. */
+@Composable
+fun GradientHeader(
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val base = modifier
+        .fillMaxWidth()
+        .clip(RoundedCornerShape(28.dp))
+        .background(appGradient())
+    val clickable = if (onClick != null) base.clickable(onClick = onClick) else base
+    Box(modifier = clickable.padding(20.dp)) {
+        Column(content = content)
     }
 }
 

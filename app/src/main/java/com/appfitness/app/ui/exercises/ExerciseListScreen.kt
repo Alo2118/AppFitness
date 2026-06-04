@@ -81,6 +81,11 @@ fun ExerciseListScreen(
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                if (visible.isEmpty()) {
+                    item {
+                        com.appfitness.app.ui.components.EmptyHint("Nessun esercizio in questa categoria.")
+                    }
+                }
                 items(visible, key = { it.id }) { exercise ->
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Row(

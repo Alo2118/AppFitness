@@ -83,12 +83,12 @@ fun GpsScreen(
         ) {
             if (activities.isEmpty()) {
                 item {
-                    Text(
+                    com.appfitness.app.ui.components.EmptyHint(
                         "Nessuna attività registrata. Tocca \"Nuova attività\" per la tua prima corsa o giro in bici.",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             } else {
+                item { com.appfitness.app.ui.components.SectionTitle("Le tue attività") }
                 items(activities, key = { it.id }) { activity ->
                     ActivityCard(
                         activity,

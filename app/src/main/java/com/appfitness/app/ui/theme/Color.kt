@@ -1,5 +1,6 @@
 package com.appfitness.app.ui.theme
 
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 // Brand palette — energetic green + warm coral accent + cool teal.
@@ -12,3 +13,6 @@ val Ink = Color(0xFF111714)
 // Gradient stops used for hero headers.
 val GradientStart = Color(0xFF1FB85C)
 val GradientEnd = Color(0xFF12B5A8)
+
+/** Brand gradient used for hero/header surfaces. */
+fun appGradient(): Brush = Brush.linearGradient(listOf(GradientStart, GradientEnd))
