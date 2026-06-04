@@ -60,15 +60,9 @@ fun MoodScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item {
-                Text(
+                com.appfitness.app.ui.components.ScreenHeader(
                     "Diario emozionale",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
                     "Registra come ti senti e scopri il legame con i tuoi allenamenti.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
 

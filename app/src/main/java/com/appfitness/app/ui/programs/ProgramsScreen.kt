@@ -20,6 +20,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.ui.draw.clip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -71,10 +72,9 @@ fun ProgramsScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item {
-                Text(
+                com.appfitness.app.ui.components.ScreenHeader(
                     "Programmi",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
+                    "Test, percorsi per sport e progressione adattiva.",
                 )
             }
 
@@ -239,7 +239,8 @@ private fun ProgramCard(
                 progress = { program.progress },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = 8.dp)
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp)),
             )
             Text(
                 "Settimana ${program.currentWeek}/${program.weeks} · ${program.completedSessions}/${program.totalSessions} sessioni",

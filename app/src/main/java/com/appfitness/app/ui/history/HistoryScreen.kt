@@ -43,10 +43,9 @@ fun HistoryScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            Text(
+            com.appfitness.app.ui.components.ScreenHeader(
                 "Storico allenamenti",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
+                "Rivivi e analizza le tue sessioni completate.",
             )
         }
         if (sessions.isEmpty()) {
