@@ -38,4 +38,5 @@ object Routes {
     fun gpsDetail(activityId: Long) = "$GPS_DETAIL/$activityId"
 
     const val ACHIEVEMENTS = "achievements"
+    const val SETTINGS = "settings"
 }

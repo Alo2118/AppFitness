@@ -99,6 +99,11 @@ del benessere olistico ma con un'esecuzione semplice e offline-first.
   - **Zone di frequenza cardiaca live**: mostra la zona corrente (Riposo →
     Massimale) rispetto alla zona target e **avvisa a voce** quando ne esci
     ("Aumenta il ritmo" / "Rallenta"), in base alla FCmax stimata dall'età.
+- **Profilo e impostazioni** — peso, altezza, età, sesso, obiettivo; preferenze
+  app (**tema** chiaro/scuro/sistema/Material You, unità, **coach vocale on/off**,
+  zona cardio target) e **"i miei attrezzi"** — salvate con DataStore. La libreria
+  esercizi può filtrare automaticamente sui tuoi attrezzi; il tema si applica a
+  tutta l'app; il toggle voce silenzia il coaching GPS.
 - **Generatore di percorsi completi** — scegli obiettivo (forza, cardio,
   dimagrimento, mobilità, total body), livello e durata: l'app costruisce un
   allenamento completo dalla libreria, adattando serie/ripetizioni/recupero e

@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,13 +43,25 @@ fun ExerciseListScreen(
     viewModel: ExerciseViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val exercises by viewModel.exercises.collectAsStateWithLifecycle()
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val settings = remember {
+        (context.applicationContext as com.appfitness.app.AppFitnessApplication).container.settingsRepository
+    }
+    val prefs by settings.preferences.collectAsState(initial = com.appfitness.app.data.model.UserPreferences())
+
     var filter by remember { mutableStateOf<ExerciseCategory?>(null) }
     var equipmentFilter by remember { mutableStateOf<com.appfitness.app.data.model.Equipment?>(null) }
+    var myOnly by remember { mutableStateOf(false) }
     var showAdd by remember { mutableStateOf(false) }
 
     val visible = exercises.filter {
-        (filter == null || it.category == filter) &&
-            (equipmentFilter == null || it.equipment == equipmentFilter)
+        val categoryOk = filter == null || it.category == filter
+        val equipmentOk = when {
+            myOnly && prefs.equipment.isNotEmpty() -> it.equipment in prefs.equipment
+            equipmentFilter != null -> it.equipment == equipmentFilter
+            else -> true
+        }
+        categoryOk && equipmentOk
     }
 
     Scaffold(
@@ -89,17 +102,26 @@ fun ExerciseListScreen(
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                if (prefs.equipment.isNotEmpty()) {
+                    item {
+                        FilterChip(
+                            selected = myOnly,
+                            onClick = { myOnly = !myOnly; if (myOnly) equipmentFilter = null },
+                            label = { Text("⭐ I miei attrezzi") },
+                        )
+                    }
+                }
                 item {
                     FilterChip(
-                        selected = equipmentFilter == null,
-                        onClick = { equipmentFilter = null },
-                        label = { Text("🧰 Tutti gli attrezzi") },
+                        selected = equipmentFilter == null && !myOnly,
+                        onClick = { equipmentFilter = null; myOnly = false },
+                        label = { Text("🧰 Tutti") },
                     )
                 }
                 items(com.appfitness.app.data.model.Equipment.entries) { eq ->
                     FilterChip(
-                        selected = equipmentFilter == eq,
-                        onClick = { equipmentFilter = eq },
+                        selected = equipmentFilter == eq && !myOnly,
+                        onClick = { equipmentFilter = eq; myOnly = false },
                         label = { Text("${eq.emoji} ${eq.label}") },
                     )
                 }

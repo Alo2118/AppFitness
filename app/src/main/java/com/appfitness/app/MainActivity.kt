@@ -15,6 +15,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -36,6 +37,7 @@ import com.appfitness.app.ui.gps.GpsScreen
 import com.appfitness.app.ui.gps.GpsTrackingScreen
 import com.appfitness.app.ui.mood.MoodScreen
 import com.appfitness.app.ui.programs.ProgramsScreen
+import com.appfitness.app.ui.settings.SettingsScreen
 import com.appfitness.app.ui.navigation.Routes
 import com.appfitness.app.ui.navigation.TopDestination
 import com.appfitness.app.ui.theme.AppFitnessTheme
@@ -45,8 +47,20 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val settings = (application as AppFitnessApplication).container.settingsRepository
         setContent {
-            AppFitnessTheme {
+            val prefs by settings.preferences.collectAsState(
+                initial = com.appfitness.app.data.model.UserPreferences(),
+            )
+            val dark = when (prefs.theme) {
+                com.appfitness.app.data.model.ThemeMode.LIGHT -> false
+                com.appfitness.app.data.model.ThemeMode.DARK -> true
+                else -> androidx.compose.foundation.isSystemInDarkTheme()
+            }
+            AppFitnessTheme(
+                darkTheme = dark,
+                dynamicColor = prefs.theme == com.appfitness.app.data.model.ThemeMode.DYNAMIC,
+            ) {
                 AppFitnessApp()
             }
         }
@@ -114,10 +128,14 @@ fun AppFitnessApp() {
                     onOpenSession = { /* history detail lives in the History tab */ },
                     onOpenGps = { navController.navigate(Routes.GPS) },
                     onOpenAchievements = { navController.navigate(Routes.ACHIEVEMENTS) },
+                    onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                 )
             }
             composable(Routes.ACHIEVEMENTS) {
                 AchievementsScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Routes.SETTINGS) {
+                SettingsScreen(onBack = { navController.popBackStack() })
             }
             composable(TopDestination.PROGRAMS.route) {
                 ProgramsScreen(

@@ -7,6 +7,7 @@ import com.appfitness.app.ble.HeartRateMonitor
 interface AppContainer {
     val repository: FitnessRepository
     val heartRateMonitor: HeartRateMonitor
+    val settingsRepository: SettingsRepository
 }
 
 class DefaultAppContainer(context: Context) : AppContainer {
@@ -28,4 +29,6 @@ class DefaultAppContainer(context: Context) : AppContainer {
     }
 
     override val heartRateMonitor: HeartRateMonitor by lazy { HeartRateMonitor(appContext) }
+
+    override val settingsRepository: SettingsRepository by lazy { SettingsRepository(appContext) }
 }

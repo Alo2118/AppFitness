@@ -10,10 +10,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -45,6 +47,7 @@ fun HomeScreen(
     onOpenSession: (Long) -> Unit,
     onOpenGps: () -> Unit,
     onOpenAchievements: () -> Unit,
+    onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
@@ -71,7 +74,7 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item {
-                HeroHeader(totalPoints = totalPoints, onClick = onOpenAchievements)
+                HeroHeader(totalPoints = totalPoints, onClick = onOpenAchievements, onSettings = onOpenSettings)
             }
 
             item { SectionTitle("Questa settimana", modifier = Modifier.padding(top = 4.dp)) }
@@ -156,7 +159,7 @@ fun HomeScreen(
 }
 
 @Composable
-private fun HeroHeader(totalPoints: Int, onClick: () -> Unit) {
+private fun HeroHeader(totalPoints: Int, onClick: () -> Unit, onSettings: () -> Unit) {
     val level = com.appfitness.app.domain.RewardLevels.levelFor(totalPoints)
     val progress = com.appfitness.app.domain.RewardLevels.levelProgress(totalPoints)
     val toNext = com.appfitness.app.domain.RewardLevels.pointsToNextLevel(totalPoints)
@@ -165,7 +168,16 @@ private fun HeroHeader(totalPoints: Int, onClick: () -> Unit) {
         modifier = Modifier.padding(top = 8.dp),
         onClick = onClick,
     ) {
-        Text("Ciao! 👋", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, color = white)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text("Ciao! 👋", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, color = white)
+            IconButton(onClick = onSettings) {
+                Icon(Icons.Filled.Settings, contentDescription = "Impostazioni", tint = white)
+            }
+        }
         Text(
             "Pronto a muoverti e sentirti meglio?",
             style = MaterialTheme.typography.bodyMedium,

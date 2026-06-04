@@ -73,6 +73,11 @@ class TrackingService : Service() {
     private var vibrator: Vibrator? = null
     private var targetPaceSecPerKm: Double? = null
     private var userAge: Int = 30
+    private var voiceEnabled: Boolean = true
+
+    private fun say(text: String) {
+        if (voiceEnabled) speech?.speak(text)
+    }
 
     private val listener = LocationListener { location -> onLocation(location) }
 
@@ -109,10 +114,11 @@ class TrackingService : Service() {
         configureGhost(intent)
         startForegroundNotification()
         requestUpdates()
-        speech?.speak(coach.startPhrase(type, targetPaceSecPerKm))
         scope.launch {
-            userAge = (application as AppFitnessApplication).container.repository
-                .latestCardioAssessment.first()?.age ?: 30
+            val container = (application as AppFitnessApplication).container
+            userAge = container.repository.latestCardioAssessment.first()?.age ?: 30
+            voiceEnabled = container.settingsRepository.preferences.first().voiceCoach
+            say(coach.startPhrase(type, targetPaceSecPerKm))
         }
 
         tickJob?.cancel()
@@ -150,7 +156,7 @@ class TrackingService : Service() {
         TrackingState.rewardCount.value += 1
         vibrate(event.tier)
         // Speak the bigger wins; small ones stay haptic + visual to avoid chatter.
-        if (event.tier != RewardTier.SMALL) speech?.speak(event.title)
+        if (event.tier != RewardTier.SMALL) say(event.title)
     }
 
     private fun vibrate(tier: RewardTier) {
@@ -205,7 +211,7 @@ class TrackingService : Service() {
                 targetZone = HeartRateZone.AEROBICA,
             )
         )
-        cue?.let { speech?.speak(it) }
+        cue?.let { say(it) }
     }
 
     private fun loadReplayGhost(activityId: Long) {
@@ -263,7 +269,7 @@ class TrackingService : Service() {
         val elapsed = ((endTime - startTime) / 1000).toInt()
         val distance = tracker.totalDistanceM
         val samples = tracker.samples.toList()
-        speech?.speak("Sessione completata. ${com.appfitness.app.domain.GeoUtils.formatKm(distance)} chilometri. Ottimo lavoro!")
+        say("Sessione completata. ${com.appfitness.app.domain.GeoUtils.formatKm(distance)} chilometri. Ottimo lavoro!")
 
         scope.launch {
             val repo = (application as AppFitnessApplication).container.repository
