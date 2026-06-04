@@ -2,6 +2,7 @@ package com.appfitness.app.data.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.appfitness.app.data.model.Equipment
 import com.appfitness.app.data.model.ExerciseCategory
 
 /**
@@ -24,4 +25,5 @@ data class Exercise(
     val isCustom: Boolean = false,
     /** Optional guide image bundled in assets, e.g. "exercises/squat.jpg". */
     val imageAsset: String? = null,
+    val equipment: Equipment = Equipment.BODYWEIGHT,
 )

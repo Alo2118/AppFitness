@@ -1,6 +1,7 @@
 package com.appfitness.app.data
 
 import androidx.room.TypeConverter
+import com.appfitness.app.data.model.Equipment
 import com.appfitness.app.data.model.ExerciseCategory
 import com.appfitness.app.data.model.FitnessLevel
 import com.appfitness.app.data.model.GpsActivityType
@@ -35,4 +36,11 @@ class Converters {
     @TypeConverter
     fun stringToGpsType(value: String): GpsActivityType =
         runCatching { GpsActivityType.valueOf(value) }.getOrDefault(GpsActivityType.RUN)
+
+    @TypeConverter
+    fun equipmentToString(equipment: Equipment): String = equipment.name
+
+    @TypeConverter
+    fun stringToEquipment(value: String): Equipment =
+        runCatching { Equipment.valueOf(value) }.getOrDefault(Equipment.BODYWEIGHT)
 }

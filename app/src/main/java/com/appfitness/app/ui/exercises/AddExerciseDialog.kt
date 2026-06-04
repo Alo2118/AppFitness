@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.appfitness.app.data.entity.Exercise
+import com.appfitness.app.data.model.Equipment
 import com.appfitness.app.data.model.ExerciseCategory
 
 @Composable
@@ -33,6 +34,7 @@ fun AddExerciseDialog(
     var muscle by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var category by remember { mutableStateOf(ExerciseCategory.STRENGTH) }
+    var equipment by remember { mutableStateOf(Equipment.BODYWEIGHT) }
     var timeBased by remember { mutableStateOf(false) }
 
     AlertDialog(
@@ -72,6 +74,19 @@ fun AddExerciseDialog(
                         )
                     }
                 }
+                Text("Attrezzo", modifier = Modifier.padding(top = 12.dp))
+                Row(
+                    modifier = Modifier.horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Equipment.entries.forEach { eq ->
+                        FilterChip(
+                            selected = equipment == eq,
+                            onClick = { equipment = eq },
+                            label = { Text("${eq.emoji} ${eq.label}") },
+                        )
+                    }
+                }
                 Row(
                     modifier = Modifier.padding(top = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -96,6 +111,7 @@ fun AddExerciseDialog(
                             description = description.trim(),
                             isTimeBased = timeBased,
                             isCustom = true,
+                            equipment = equipment,
                         )
                     )
                 },

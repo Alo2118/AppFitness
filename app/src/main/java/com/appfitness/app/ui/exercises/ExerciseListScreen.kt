@@ -43,9 +43,13 @@ fun ExerciseListScreen(
 ) {
     val exercises by viewModel.exercises.collectAsStateWithLifecycle()
     var filter by remember { mutableStateOf<ExerciseCategory?>(null) }
+    var equipmentFilter by remember { mutableStateOf<com.appfitness.app.data.model.Equipment?>(null) }
     var showAdd by remember { mutableStateOf(false) }
 
-    val visible = exercises.filter { filter == null || it.category == filter }
+    val visible = exercises.filter {
+        (filter == null || it.category == filter) &&
+            (equipmentFilter == null || it.equipment == equipmentFilter)
+    }
 
     Scaffold(
         modifier = modifier,
@@ -77,6 +81,26 @@ fun ExerciseListScreen(
                         selected = filter == cat,
                         onClick = { filter = cat },
                         label = { Text(cat.label) },
+                    )
+                }
+            }
+
+            LazyRow(
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                item {
+                    FilterChip(
+                        selected = equipmentFilter == null,
+                        onClick = { equipmentFilter = null },
+                        label = { Text("🧰 Tutti gli attrezzi") },
+                    )
+                }
+                items(com.appfitness.app.data.model.Equipment.entries) { eq ->
+                    FilterChip(
+                        selected = equipmentFilter == eq,
+                        onClick = { equipmentFilter = eq },
+                        label = { Text("${eq.emoji} ${eq.label}") },
                     )
                 }
             }
@@ -116,7 +140,7 @@ fun ExerciseListScreen(
                                     fontWeight = FontWeight.SemiBold,
                                 )
                                 Text(
-                                    "${exercise.category.label} · ${exercise.muscleGroup}",
+                                    "${exercise.equipment.emoji} ${exercise.equipment.label} · ${exercise.muscleGroup}",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
