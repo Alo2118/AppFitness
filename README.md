@@ -84,6 +84,9 @@ del benessere olistico ma con un'esecuzione semplice e offline-first.
 - **Programmi per sport specifico** — piani multi-settimana per Pallavolo,
   Ciclismo, Fitness, Calcio, Running, Nuoto, Tennis, Basket. Ogni sport alterna
   obiettivi (forza/cardio/total body) coerenti con la disciplina.
+- **Programmi che rispettano gli attrezzi** — generatore e programmi per sport
+  selezionano solo esercizi fattibili con l'attrezzatura impostata nel profilo
+  (il corpo libero è sempre incluso).
 - **Programmazione adattiva** — dopo ogni sessione del programma il carico si
   ricalibra automaticamente in base a **% serie completate + energia post-workout**:
   progressione quando vai forte, scarico quando fai fatica, con suggerimento testuale.
@@ -112,7 +115,7 @@ del benessere olistico ma con un'esecuzione semplice e offline-first.
   dimagrimento, mobilità, total body), livello e durata: l'app costruisce un
   allenamento completo dalla libreria, adattando serie/ripetizioni/recupero e
   **modulando l'intensità in base all'energia del giorno**. Anteprima, "rigenera"
-  e avvio in un tap.
+  e avvio in un tap. **Rispetta gli attrezzi**: genera solo con ciò che possiedi (da Impostazioni).
 - **Libreria esercizi con immagini guida animate e filtro per attrezzo** — 24
   esercizi pre-caricati (corpo libero + **bilanciere, manubri, panca, lat machine,
   leg machine**) filtrabili per **categoria** e per **attrezzo** (vedi solo ciò che

@@ -51,7 +51,10 @@ fun GenerateWorkoutDialog(
     onConfirm: (title: String, moodBefore: Int?, energyBefore: Int?, plan: List<GeneratedExercise>) -> Unit,
     exerciseViewModel: ExerciseViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
-    val library by exerciseViewModel.exercises.collectAsStateWithLifecycle()
+    val allExercises by exerciseViewModel.exercises.collectAsStateWithLifecycle()
+    val prefs = com.appfitness.app.ui.components.rememberUserPreferences()
+    // Only generate from exercises doable with the user's equipment.
+    val library = com.appfitness.app.domain.ExerciseFilters.forEquipment(allExercises, prefs.equipment)
 
     var goal by remember { mutableStateOf(WorkoutGoal.TOTAL_BODY) }
     var level by remember { mutableStateOf(FitnessLevel.INTERMEDIO) }

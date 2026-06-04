@@ -25,6 +25,7 @@ class DefaultAppContainer(context: Context) : AppContainer {
             gpsDao = database.gpsDao(),
             rewardDao = database.rewardDao(),
             achievementDao = database.achievementDao(),
+            settingsRepository = settingsRepository,
         )
     }
 

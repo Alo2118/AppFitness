@@ -27,6 +27,7 @@ import com.appfitness.app.data.relation.SessionWithSets
 import com.appfitness.app.domain.AdaptiveEngine
 import com.appfitness.app.domain.AssessmentEvaluator
 import com.appfitness.app.domain.AchievementEvaluator
+import com.appfitness.app.domain.ExerciseFilters
 import com.appfitness.app.domain.GeneratedExercise
 import com.appfitness.app.domain.HrFitnessEvaluator
 import com.appfitness.app.domain.RewardEvent
@@ -52,6 +53,7 @@ class FitnessRepository(
     private val gpsDao: GpsDao,
     private val rewardDao: RewardDao,
     private val achievementDao: AchievementDao,
+    private val settingsRepository: SettingsRepository,
 ) {
     // ----- Exercises -----
     val exercises: Flow<List<Exercise>> = exerciseDao.observeAll()
@@ -276,7 +278,10 @@ class FitnessRepository(
     /** Generates and starts the program's next adaptive session. */
     suspend fun startProgramSession(programId: Long, energy: Int?): Long? {
         val program = programDao.getById(programId) ?: return null
-        val plan = SportProgramGenerator.nextWorkout(program, exercisesSnapshot(), energy)
+        // Only use exercises doable with the user's equipment.
+        val owned = settingsRepository.preferences.first().equipment
+        val library = ExerciseFilters.forEquipment(exercisesSnapshot(), owned)
+        val plan = SportProgramGenerator.nextWorkout(program, library, energy)
         if (plan.isEmpty()) return null
         return startGeneratedSession(
             title = SportProgramGenerator.sessionTitle(program),
