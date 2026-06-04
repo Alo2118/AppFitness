@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.appfitness.app.ui.theme.appGradient
 
 /** Reusable design-system building blocks shared across screens. */
@@ -129,6 +130,28 @@ fun BackTopBar(
         },
         actions = actions,
     )
+}
+
+/** Compact action tile (emoji + label) for a tidy quick-actions grid. */
+@Composable
+fun QuickActionTile(
+    emoji: String,
+    label: String,
+    modifier: Modifier = Modifier,
+    container: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primaryContainer,
+    onClick: () -> Unit,
+) {
+    Card(onClick = onClick, modifier = modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = container)) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(emoji, fontSize = 26.sp)
+            Text(
+                label,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(top = 8.dp),
+            )
+        }
+    }
 }
 
 /** Compact metric tile used on dashboards. */

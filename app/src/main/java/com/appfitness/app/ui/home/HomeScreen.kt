@@ -32,8 +32,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.appfitness.app.data.model.MoodLevel
 import com.appfitness.app.data.relation.SessionWithSets
 import com.appfitness.app.ui.AppViewModelProvider
-import com.appfitness.app.ui.components.ActionCard
 import com.appfitness.app.ui.components.EmptyHint
+import com.appfitness.app.ui.components.QuickActionTile
 import com.appfitness.app.ui.components.SectionTitle
 import com.appfitness.app.ui.components.StatTile
 import com.appfitness.app.ui.util.formatDuration
@@ -74,50 +74,51 @@ fun HomeScreen(
                 HeroHeader(totalPoints = totalPoints, onClick = onOpenAchievements)
             }
 
+            item { SectionTitle("Questa settimana", modifier = Modifier.padding(top = 4.dp)) }
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     StatTile(
                         value = state.weekWorkouts.toString(),
-                        label = "Allenamenti\nquesta settimana",
+                        label = "Allenamenti",
                         modifier = Modifier.weight(1f),
                         container = MaterialTheme.colorScheme.primaryContainer,
                     )
                     StatTile(
                         value = "${state.weekMinutes}'",
-                        label = "Minuti\nattivi",
+                        label = "Minuti attivi",
                         modifier = Modifier.weight(1f),
                         container = MaterialTheme.colorScheme.secondaryContainer,
                     )
                     StatTile(
                         value = moodAverageEmoji(state),
-                        label = "Umore\nrecente",
+                        label = "Umore",
                         modifier = Modifier.weight(1f),
                         container = MaterialTheme.colorScheme.tertiaryContainer,
                     )
                 }
             }
 
+            item { SectionTitle("Azioni rapide", modifier = Modifier.padding(top = 4.dp)) }
             item {
-                ActionCard(
-                    title = "✨ Genera un percorso completo",
-                    subtitle = "Scegli obiettivo, livello e durata: costruiamo noi l'allenamento, adattato alla tua energia di oggi.",
-                    container = MaterialTheme.colorScheme.tertiaryContainer,
-                    onClick = { showGenerateDialog = true },
-                )
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    QuickActionTile(
+                        emoji = "✨",
+                        label = "Genera percorso",
+                        modifier = Modifier.weight(1f),
+                        container = MaterialTheme.colorScheme.tertiaryContainer,
+                        onClick = { showGenerateDialog = true },
+                    )
+                    QuickActionTile(
+                        emoji = "🏃",
+                        label = "Corsa & Bici",
+                        modifier = Modifier.weight(1f),
+                        container = MaterialTheme.colorScheme.secondaryContainer,
+                        onClick = onOpenGps,
+                    )
+                }
             }
 
-            item {
-                ActionCard(
-                    title = "🏃 Corsa & Bici (GPS)",
-                    subtitle = "Traccia il percorso e sfida un fantasma: una tua sessione, un ritmo costante o un tempo da battere.",
-                    container = MaterialTheme.colorScheme.secondaryContainer,
-                    onClick = onOpenGps,
-                )
-            }
-
-            item {
-                SectionTitle("Allenamenti recenti", modifier = Modifier.padding(top = 8.dp))
-            }
+            item { SectionTitle("Allenamenti recenti", modifier = Modifier.padding(top = 4.dp)) }
 
             if (state.recentSessions.isEmpty()) {
                 item {
