@@ -216,6 +216,7 @@ class FitnessRepository(
 
     // ----- Cardio test (heart-rate monitor) -----
     val latestCardioAssessment: Flow<CardioAssessment?> = cardioAssessmentDao.observeLatest()
+    val allCardioAssessments: Flow<List<CardioAssessment>> = cardioAssessmentDao.observeAll()
 
     /** Evaluates and stores a heart-rate based fitness test, returning the result. */
     suspend fun saveCardioAssessment(

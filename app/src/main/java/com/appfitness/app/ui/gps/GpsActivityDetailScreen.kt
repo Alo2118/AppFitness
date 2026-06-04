@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
@@ -38,7 +39,10 @@ import java.io.File
 @Composable
 fun GpsActivityDetailScreen(activityId: Long, onBack: () -> Unit) {
     val context = LocalContext.current
-    val repository = (context.applicationContext as AppFitnessApplication).container.repository
+    val container = (context.applicationContext as AppFitnessApplication).container
+    val repository = container.repository
+    val prefs by container.settingsRepository.preferences
+        .collectAsState(initial = com.appfitness.app.data.model.UserPreferences())
 
     val data by produceState<ActivityWithPoints?>(initialValue = null, activityId) {
         value = repository.getActivityWithPoints(activityId)
@@ -111,6 +115,10 @@ fun GpsActivityDetailScreen(activityId: Long, onBack: () -> Unit) {
                 )
                 Text("Durata: ${formatDuration(activity.durationSec)}")
                 Text("Ritmo medio: ${GeoUtils.formatPace(activity.avgPaceSecPerKm.toDouble())}/km")
+                val kcal = com.appfitness.app.domain.CalorieEstimator.forGps(
+                    activity.type, activity.distanceM / 1000.0, activity.durationSec, prefs.weightKg,
+                )
+                Text("🔥 ~$kcal kcal", style = MaterialTheme.typography.titleMedium)
             }
         }
     }

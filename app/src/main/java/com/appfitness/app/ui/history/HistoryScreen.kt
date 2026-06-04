@@ -17,7 +17,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +38,10 @@ fun HistoryScreen(
     viewModel: HistoryViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val sessions by viewModel.sessions.collectAsStateWithLifecycle()
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val prefs by remember {
+        (context.applicationContext as com.appfitness.app.AppFitnessApplication).container.settingsRepository.preferences
+    }.collectAsState(initial = com.appfitness.app.data.model.UserPreferences())
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -52,14 +58,18 @@ fun HistoryScreen(
             item { com.appfitness.app.ui.components.EmptyHint("Nessun allenamento completato.") }
         } else {
             items(sessions, key = { it.session.id }) { session ->
-                SessionDetailCard(session, onDelete = { viewModel.delete(session.session.id) })
+                SessionDetailCard(
+                    session,
+                    weightKg = prefs.weightKg,
+                    onDelete = { viewModel.delete(session.session.id) },
+                )
             }
         }
     }
 }
 
 @Composable
-private fun SessionDetailCard(session: SessionWithSets, onDelete: () -> Unit) {
+private fun SessionDetailCard(session: SessionWithSets, weightKg: Float, onDelete: () -> Unit) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -84,8 +94,9 @@ private fun SessionDetailCard(session: SessionWithSets, onDelete: () -> Unit) {
                 }
             }
 
+            val kcal = com.appfitness.app.domain.CalorieEstimator.forWorkout(session.session.totalDurationSec, weightKg)
             Text(
-                text = "⏱ ${formatDuration(session.session.totalDurationSec)}  ·  ${session.totalSets} serie  ·  ${session.totalVolumeKg.toInt()} kg",
+                text = "⏱ ${formatDuration(session.session.totalDurationSec)}  ·  ${session.totalSets} serie  ·  ${session.totalVolumeKg.toInt()} kg  ·  🔥 ~$kcal kcal",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(top = 4.dp),
             )

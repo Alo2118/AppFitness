@@ -39,4 +39,5 @@ object Routes {
 
     const val ACHIEVEMENTS = "achievements"
     const val SETTINGS = "settings"
+    const val STATS = "stats"
 }

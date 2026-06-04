@@ -99,6 +99,10 @@ del benessere olistico ma con un'esecuzione semplice e offline-first.
   - **Zone di frequenza cardiaca live**: mostra la zona corrente (Riposo →
     Massimale) rispetto alla zona target e **avvisa a voce** quando ne esci
     ("Aumenta il ritmo" / "Rallenta"), in base alla FCmax stimata dall'età.
+- **Andamento (grafici) e stima calorie** — schermata "Andamento" con grafici nel
+  tempo: allenamenti e distanza per settimana, **VO₂max** e **umore**; calorie
+  stimate (metodo MET dal peso del profilo) mostrate sulle attività GPS e negli
+  allenamenti dello storico.
 - **Profilo e impostazioni** — peso, altezza, età, sesso, obiettivo; preferenze
   app (**tema** chiaro/scuro/sistema/Material You, unità, **coach vocale on/off**,
   zona cardio target) e **"i miei attrezzi"** — salvate con DataStore. La libreria

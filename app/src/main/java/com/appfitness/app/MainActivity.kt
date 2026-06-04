@@ -38,6 +38,7 @@ import com.appfitness.app.ui.gps.GpsTrackingScreen
 import com.appfitness.app.ui.mood.MoodScreen
 import com.appfitness.app.ui.programs.ProgramsScreen
 import com.appfitness.app.ui.settings.SettingsScreen
+import com.appfitness.app.ui.stats.StatsScreen
 import com.appfitness.app.ui.navigation.Routes
 import com.appfitness.app.ui.navigation.TopDestination
 import com.appfitness.app.ui.theme.AppFitnessTheme
@@ -129,7 +130,11 @@ fun AppFitnessApp() {
                     onOpenGps = { navController.navigate(Routes.GPS) },
                     onOpenAchievements = { navController.navigate(Routes.ACHIEVEMENTS) },
                     onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                    onOpenStats = { navController.navigate(Routes.STATS) },
                 )
+            }
+            composable(Routes.STATS) {
+                StatsScreen(onBack = { navController.popBackStack() })
             }
             composable(Routes.ACHIEVEMENTS) {
                 AchievementsScreen(onBack = { navController.popBackStack() })

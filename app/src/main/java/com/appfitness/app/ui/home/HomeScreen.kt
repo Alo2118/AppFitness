@@ -48,6 +48,7 @@ fun HomeScreen(
     onOpenGps: () -> Unit,
     onOpenAchievements: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenStats: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
@@ -117,6 +118,13 @@ fun HomeScreen(
                         modifier = Modifier.weight(1f),
                         container = MaterialTheme.colorScheme.secondaryContainer,
                         onClick = onOpenGps,
+                    )
+                    QuickActionTile(
+                        emoji = "📈",
+                        label = "Andamento",
+                        modifier = Modifier.weight(1f),
+                        container = MaterialTheme.colorScheme.primaryContainer,
+                        onClick = onOpenStats,
                     )
                 }
             }

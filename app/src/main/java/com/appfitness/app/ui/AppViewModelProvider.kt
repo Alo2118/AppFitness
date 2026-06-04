@@ -15,6 +15,7 @@ import com.appfitness.app.ui.home.HomeViewModel
 import com.appfitness.app.ui.mood.MoodViewModel
 import com.appfitness.app.ui.programs.ProgramsViewModel
 import com.appfitness.app.ui.settings.SettingsViewModel
+import com.appfitness.app.ui.stats.StatsViewModel
 import com.appfitness.app.ui.workout.WorkoutViewModel
 
 /** Central place wiring every ViewModel to the shared repository. */
@@ -29,6 +30,7 @@ object AppViewModelProvider {
         initializer { GpsViewModel(repository()) }
         initializer { AchievementsViewModel(repository()) }
         initializer { SettingsViewModel(application().container.settingsRepository) }
+        initializer { StatsViewModel(repository()) }
         initializer { WorkoutViewModel(repository(), this.createSavedStateHandle()) }
     }
 }
