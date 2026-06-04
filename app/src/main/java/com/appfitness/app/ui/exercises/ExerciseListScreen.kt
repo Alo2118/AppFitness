@@ -23,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,11 +42,7 @@ fun ExerciseListScreen(
     viewModel: ExerciseViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val exercises by viewModel.exercises.collectAsStateWithLifecycle()
-    val context = androidx.compose.ui.platform.LocalContext.current
-    val settings = remember {
-        (context.applicationContext as com.appfitness.app.AppFitnessApplication).container.settingsRepository
-    }
-    val prefs by settings.preferences.collectAsState(initial = com.appfitness.app.data.model.UserPreferences())
+    val prefs = com.appfitness.app.ui.components.rememberUserPreferences()
 
     var filter by remember { mutableStateOf<ExerciseCategory?>(null) }
     var equipmentFilter by remember { mutableStateOf<com.appfitness.app.data.model.Equipment?>(null) }

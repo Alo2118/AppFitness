@@ -18,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
@@ -39,10 +38,8 @@ import java.io.File
 @Composable
 fun GpsActivityDetailScreen(activityId: Long, onBack: () -> Unit) {
     val context = LocalContext.current
-    val container = (context.applicationContext as AppFitnessApplication).container
-    val repository = container.repository
-    val prefs by container.settingsRepository.preferences
-        .collectAsState(initial = com.appfitness.app.data.model.UserPreferences())
+    val repository = (context.applicationContext as AppFitnessApplication).container.repository
+    val prefs = com.appfitness.app.ui.components.rememberUserPreferences()
 
     val data by produceState<ActivityWithPoints?>(initialValue = null, activityId) {
         value = repository.getActivityWithPoints(activityId)

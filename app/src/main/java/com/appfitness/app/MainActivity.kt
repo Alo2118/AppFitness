@@ -15,7 +15,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -48,11 +47,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val settings = (application as AppFitnessApplication).container.settingsRepository
         setContent {
-            val prefs by settings.preferences.collectAsState(
-                initial = com.appfitness.app.data.model.UserPreferences(),
-            )
+            val prefs = com.appfitness.app.ui.components.rememberUserPreferences()
             val dark = when (prefs.theme) {
                 com.appfitness.app.data.model.ThemeMode.LIGHT -> false
                 com.appfitness.app.data.model.ThemeMode.DARK -> true
