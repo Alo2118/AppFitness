@@ -1,0 +1,210 @@
+package com.appfitness.app.data
+
+import com.appfitness.app.data.entity.Exercise
+import com.appfitness.app.data.model.Equipment
+import com.appfitness.app.data.model.ExerciseCategory
+
+/**
+ * Starter exercise library seeded on first launch so the app is useful out of
+ * the box. Users can add their own custom exercises on top of these.
+ */
+object ExerciseSeed {
+
+    val exercises: List<Exercise> = listOf(
+        Exercise(
+            name = "Squat a corpo libero",
+            category = ExerciseCategory.STRENGTH,
+            muscleGroup = "Gambe, glutei",
+            description = "Piedi alla larghezza delle spalle, scendi spingendo i fianchi indietro mantenendo la schiena dritta.",
+            isTimeBased = false, defaultSets = 4, defaultReps = 15, defaultRestSec = 60,
+            imageAsset = "exercises/squat.jpg",
+        ),
+        Exercise(
+            name = "Affondi alternati",
+            category = ExerciseCategory.STRENGTH,
+            muscleGroup = "Gambe, glutei",
+            description = "Passo avanti, piega entrambe le ginocchia a 90°, torna in posizione e alterna gamba.",
+            isTimeBased = false, defaultSets = 3, defaultReps = 12, defaultRestSec = 60,
+            imageAsset = "exercises/lunge.jpg",
+        ),
+        Exercise(
+            name = "Push-up",
+            category = ExerciseCategory.STRENGTH,
+            muscleGroup = "Petto, tricipiti, spalle",
+            description = "Corpo in linea retta, scendi piegando i gomiti e spingi verso l'alto.",
+            isTimeBased = false, defaultSets = 4, defaultReps = 12, defaultRestSec = 75,
+            imageAsset = "exercises/pushup.jpg",
+        ),
+        Exercise(
+            name = "Plank",
+            category = ExerciseCategory.CORE,
+            muscleGroup = "Core, addome",
+            description = "Avambracci a terra, corpo in linea retta, contrai addome e glutei.",
+            isTimeBased = true, defaultSets = 3, defaultDurationSec = 45, defaultRestSec = 45,
+            imageAsset = "exercises/plank.jpg",
+        ),
+        Exercise(
+            name = "Mountain climber",
+            category = ExerciseCategory.CARDIO,
+            muscleGroup = "Core, cardio",
+            description = "In posizione di plank alta, porta velocemente le ginocchia al petto alternandole.",
+            isTimeBased = true, defaultSets = 4, defaultDurationSec = 30, defaultRestSec = 30,
+            imageAsset = "exercises/mountain_climber.jpg",
+        ),
+        Exercise(
+            name = "Jumping jack",
+            category = ExerciseCategory.CARDIO,
+            muscleGroup = "Total body, cardio",
+            description = "Salta aprendo gambe e braccia, poi richiudi. Mantieni un ritmo costante.",
+            isTimeBased = true, defaultSets = 3, defaultDurationSec = 40, defaultRestSec = 30,
+            imageAsset = "exercises/jumping_jack.jpg",
+        ),
+        Exercise(
+            name = "Burpees",
+            category = ExerciseCategory.FULL_BODY,
+            muscleGroup = "Total body",
+            description = "Squat, kick-back in plank, push-up, ritorno e salto esplosivo verso l'alto.",
+            isTimeBased = false, defaultSets = 4, defaultReps = 10, defaultRestSec = 75,
+            imageAsset = "exercises/burpee.jpg",
+        ),
+        Exercise(
+            name = "Crunch addominali",
+            category = ExerciseCategory.CORE,
+            muscleGroup = "Addome",
+            description = "Sdraiato, solleva le scapole contraendo l'addome senza tirare il collo.",
+            isTimeBased = false, defaultSets = 3, defaultReps = 20, defaultRestSec = 45,
+            imageAsset = "exercises/crunch.jpg",
+        ),
+        Exercise(
+            name = "Stacco rumeno con manubri",
+            category = ExerciseCategory.STRENGTH,
+            muscleGroup = "Femorali, glutei, schiena",
+            description = "Manubri davanti alle cosce, fianchi indietro, scendi mantenendo la schiena neutra.",
+            isTimeBased = false, defaultSets = 4, defaultReps = 10, defaultRestSec = 90,
+            imageAsset = "exercises/romanian_deadlift.jpg",
+            equipment = Equipment.DUMBBELL,
+        ),
+        Exercise(
+            name = "Corsa sul posto",
+            category = ExerciseCategory.CARDIO,
+            muscleGroup = "Cardio, gambe",
+            description = "Corri sul posto portando le ginocchia in alto, mantenendo un ritmo sostenuto.",
+            isTimeBased = true, defaultSets = 3, defaultDurationSec = 60, defaultRestSec = 30,
+            imageAsset = "exercises/running.jpg",
+        ),
+        Exercise(
+            name = "Superman",
+            category = ExerciseCategory.MOBILITY,
+            muscleGroup = "Lombari, schiena",
+            description = "Prono, solleva contemporaneamente braccia e gambe contraendo la schiena bassa.",
+            isTimeBased = true, defaultSets = 3, defaultDurationSec = 30, defaultRestSec = 40,
+            imageAsset = "exercises/superman.jpg",
+        ),
+        Exercise(
+            name = "Stretching gatto-mucca",
+            category = ExerciseCategory.MOBILITY,
+            muscleGroup = "Colonna, mobilità",
+            description = "In quadrupedia, alterna inarcamento e incurvamento della schiena al ritmo del respiro.",
+            isTimeBased = true, defaultSets = 2, defaultDurationSec = 60, defaultRestSec = 20,
+            imageAsset = "exercises/cat_cow.jpg",
+        ),
+
+        // ----- Esercizi con attrezzi -----
+        Exercise(
+            name = "Panca piana con bilanciere",
+            category = ExerciseCategory.STRENGTH,
+            muscleGroup = "Petto, tricipiti, spalle",
+            description = "Sdraiato sulla panca, abbassa il bilanciere al petto e spingi verso l'alto controllando il movimento.",
+            isTimeBased = false, defaultSets = 4, defaultReps = 8, defaultRestSec = 120,
+            imageAsset = "exercises/bench_press.jpg", equipment = Equipment.BENCH,
+        ),
+        Exercise(
+            name = "Panca inclinata con bilanciere",
+            category = ExerciseCategory.STRENGTH,
+            muscleGroup = "Petto alto, spalle",
+            description = "Su panca inclinata a 30-45°, spingi il bilanciere verso l'alto mantenendo i gomiti a circa 45°.",
+            isTimeBased = false, defaultSets = 4, defaultReps = 10, defaultRestSec = 120,
+            imageAsset = "exercises/incline_press.jpg", equipment = Equipment.BENCH,
+        ),
+        Exercise(
+            name = "Croci con manubri su panca",
+            category = ExerciseCategory.STRENGTH,
+            muscleGroup = "Petto",
+            description = "Sdraiato, apri le braccia con i manubri mantenendo i gomiti leggermente flessi, poi richiudi sopra il petto.",
+            isTimeBased = false, defaultSets = 3, defaultReps = 12, defaultRestSec = 75,
+            imageAsset = "exercises/dumbbell_fly.jpg", equipment = Equipment.BENCH,
+        ),
+        Exercise(
+            name = "Lat machine",
+            category = ExerciseCategory.STRENGTH,
+            muscleGroup = "Dorsali, bicipiti",
+            description = "Presa larga, tira la barra verso il petto contraendo le scapole, poi risali controllando.",
+            isTimeBased = false, defaultSets = 4, defaultReps = 10, defaultRestSec = 90,
+            imageAsset = "exercises/lat_pulldown.jpg", equipment = Equipment.LAT_MACHINE,
+        ),
+        Exercise(
+            name = "Rematore con bilanciere",
+            category = ExerciseCategory.STRENGTH,
+            muscleGroup = "Dorsali, schiena",
+            description = "Busto inclinato e schiena neutra, tira il bilanciere verso l'addome stringendo le scapole.",
+            isTimeBased = false, defaultSets = 4, defaultReps = 10, defaultRestSec = 90,
+            imageAsset = "exercises/barbell_row.jpg", equipment = Equipment.BARBELL,
+        ),
+        Exercise(
+            name = "Leg extension",
+            category = ExerciseCategory.STRENGTH,
+            muscleGroup = "Quadricipiti",
+            description = "Seduto alla macchina, estendi le gambe fino a quasi bloccare le ginocchia, poi torna controllando.",
+            isTimeBased = false, defaultSets = 3, defaultReps = 12, defaultRestSec = 75,
+            imageAsset = "exercises/leg_extension.jpg", equipment = Equipment.LEG_MACHINE,
+        ),
+        Exercise(
+            name = "Leg curl",
+            category = ExerciseCategory.STRENGTH,
+            muscleGroup = "Femorali",
+            description = "Sdraiato/seduto alla macchina, fletti le gambe portando i talloni verso i glutei, poi rilascia lentamente.",
+            isTimeBased = false, defaultSets = 3, defaultReps = 12, defaultRestSec = 75,
+            imageAsset = "exercises/leg_curl.jpg", equipment = Equipment.LEG_MACHINE,
+        ),
+        Exercise(
+            name = "Curl con bilanciere",
+            category = ExerciseCategory.STRENGTH,
+            muscleGroup = "Bicipiti",
+            description = "In piedi, fletti i gomiti sollevando il bilanciere senza dondolare il busto.",
+            isTimeBased = false, defaultSets = 3, defaultReps = 12, defaultRestSec = 60,
+            imageAsset = "exercises/barbell_curl.jpg", equipment = Equipment.BARBELL,
+        ),
+        Exercise(
+            name = "Curl con manubri",
+            category = ExerciseCategory.STRENGTH,
+            muscleGroup = "Bicipiti",
+            description = "Alterna o solleva insieme i manubri flettendo i gomiti, ruotando i polsi verso l'alto.",
+            isTimeBased = false, defaultSets = 3, defaultReps = 12, defaultRestSec = 60,
+            imageAsset = "exercises/dumbbell_curl.jpg", equipment = Equipment.DUMBBELL,
+        ),
+        Exercise(
+            name = "Lento avanti con bilanciere",
+            category = ExerciseCategory.STRENGTH,
+            muscleGroup = "Spalle, tricipiti",
+            description = "In piedi, spingi il bilanciere sopra la testa partendo dalle clavicole, senza inarcare la schiena.",
+            isTimeBased = false, defaultSets = 4, defaultReps = 8, defaultRestSec = 90,
+            imageAsset = "exercises/military_press.jpg", equipment = Equipment.BARBELL,
+        ),
+        Exercise(
+            name = "Spalle con manubri",
+            category = ExerciseCategory.STRENGTH,
+            muscleGroup = "Spalle",
+            description = "In piedi o seduto, spingi i manubri verso l'alto fino a quasi distendere le braccia.",
+            isTimeBased = false, defaultSets = 3, defaultReps = 12, defaultRestSec = 75,
+            imageAsset = "exercises/dumbbell_press.jpg", equipment = Equipment.DUMBBELL,
+        ),
+        Exercise(
+            name = "Rematore manubrio (un braccio)",
+            category = ExerciseCategory.STRENGTH,
+            muscleGroup = "Dorsali, schiena",
+            description = "Un ginocchio e una mano sulla panca, tira il manubrio verso il fianco mantenendo la schiena piatta.",
+            isTimeBased = false, defaultSets = 3, defaultReps = 12, defaultRestSec = 75,
+            imageAsset = "exercises/dumbbell_row.jpg", equipment = Equipment.DUMBBELL,
+        ),
+    )
+}

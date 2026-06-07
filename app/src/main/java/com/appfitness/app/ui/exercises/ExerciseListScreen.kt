@@ -1,0 +1,191 @@
+package com.appfitness.app.ui.exercises
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Card
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.appfitness.app.data.model.ExerciseCategory
+import com.appfitness.app.ui.AppViewModelProvider
+
+@Composable
+fun ExerciseListScreen(
+    modifier: Modifier = Modifier,
+    viewModel: ExerciseViewModel = viewModel(factory = AppViewModelProvider.Factory),
+) {
+    val exercises by viewModel.exercises.collectAsStateWithLifecycle()
+    val prefs = com.appfitness.app.ui.components.rememberUserPreferences()
+
+    var filter by remember { mutableStateOf<ExerciseCategory?>(null) }
+    var equipmentFilter by remember { mutableStateOf<com.appfitness.app.data.model.Equipment?>(null) }
+    var myOnly by remember { mutableStateOf(false) }
+    var showAdd by remember { mutableStateOf(false) }
+
+    val visible = exercises.filter {
+        val categoryOk = filter == null || it.category == filter
+        val equipmentOk = when {
+            myOnly && prefs.equipment.isNotEmpty() -> it.equipment in prefs.equipment
+            equipmentFilter != null -> it.equipment == equipmentFilter
+            else -> true
+        }
+        categoryOk && equipmentOk
+    }
+
+    Scaffold(
+        modifier = modifier,
+        floatingActionButton = {
+            FloatingActionButton(onClick = { showAdd = true }) {
+                Icon(Icons.Filled.Add, contentDescription = "Aggiungi esercizio")
+            }
+        },
+    ) { padding ->
+        Column(modifier = Modifier.padding(padding)) {
+            com.appfitness.app.ui.components.ScreenHeader(
+                title = "Esercizi",
+                subtitle = "Sfoglia la libreria con le guide animate o crea i tuoi.",
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
+            )
+            LazyRow(
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                item {
+                    FilterChip(
+                        selected = filter == null,
+                        onClick = { filter = null },
+                        label = { Text("Tutti") },
+                    )
+                }
+                items(ExerciseCategory.entries) { cat ->
+                    FilterChip(
+                        selected = filter == cat,
+                        onClick = { filter = cat },
+                        label = { Text(cat.label) },
+                    )
+                }
+            }
+
+            LazyRow(
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                if (prefs.equipment.isNotEmpty()) {
+                    item {
+                        FilterChip(
+                            selected = myOnly,
+                            onClick = { myOnly = !myOnly; if (myOnly) equipmentFilter = null },
+                            label = { Text("⭐ I miei attrezzi") },
+                        )
+                    }
+                }
+                item {
+                    FilterChip(
+                        selected = equipmentFilter == null && !myOnly,
+                        onClick = { equipmentFilter = null; myOnly = false },
+                        label = { Text("🧰 Tutti") },
+                    )
+                }
+                items(com.appfitness.app.data.model.Equipment.entries) { eq ->
+                    FilterChip(
+                        selected = equipmentFilter == eq && !myOnly,
+                        onClick = { equipmentFilter = eq; myOnly = false },
+                        label = { Text("${eq.emoji} ${eq.label}") },
+                    )
+                }
+            }
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                if (visible.isEmpty()) {
+                    item {
+                        com.appfitness.app.ui.components.EmptyHint("Nessun esercizio in questa categoria.")
+                    }
+                }
+                items(visible, key = { it.id }) { exercise ->
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            exercise.imageAsset?.let { asset ->
+                                com.appfitness.app.ui.components.AnimatedExerciseImage(
+                                    assetPath = asset,
+                                    contentDescription = exercise.name,
+                                    modifier = Modifier
+                                        .size(72.dp)
+                                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp)),
+                                )
+                                androidx.compose.foundation.layout.Spacer(Modifier.size(12.dp))
+                            }
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    exercise.name,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                )
+                                Text(
+                                    "${exercise.equipment.emoji} ${exercise.equipment.label} · ${exercise.muscleGroup}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                Text(
+                                    exercise.description,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(top = 4.dp),
+                                )
+                            }
+                            if (exercise.isCustom) {
+                                IconButton(onClick = { viewModel.deleteCustom(exercise.id) }) {
+                                    Icon(Icons.Filled.Delete, contentDescription = "Elimina")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (showAdd) {
+        AddExerciseDialog(
+            onDismiss = { showAdd = false },
+            onConfirm = {
+                viewModel.save(it)
+                showAdd = false
+            },
+        )
+    }
+}
