@@ -8,10 +8,10 @@ import org.junit.Test
 class RepProfilesTest {
 
     @Test
-    fun `strength has a higher threshold and slower cadence than core`() {
+    fun `strength needs a larger swing and slower cadence than core`() {
         val strength = RepProfiles.forCategory(ExerciseCategory.STRENGTH)
         val core = RepProfiles.forCategory(ExerciseCategory.CORE)
-        assertTrue(strength.highThreshold > core.highThreshold)
+        assertTrue(strength.minProminence > core.minProminence)
         assertTrue(strength.minRepIntervalMs > core.minRepIntervalMs)
     }
 

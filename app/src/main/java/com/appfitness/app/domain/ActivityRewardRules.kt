@@ -26,6 +26,9 @@ object ActivityRewardRules {
             RewardEvent("Serie completata!", 15, RewardTier.SMALL)
         }
 
+    fun timedSet(durationSec: Int): RewardEvent =
+        RewardEvent("Tempo completato! ⏱", (15 + durationSec / 6).coerceAtMost(60), RewardTier.SMALL)
+
     fun cardioTest(): RewardEvent =
         RewardEvent("Test cardio completato! ❤️", 80, RewardTier.MEDIUM)
 

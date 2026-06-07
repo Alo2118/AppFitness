@@ -29,8 +29,8 @@ class SensorRepCounter(
         sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
     private val detector = RepDetector(
-        highThreshold = profile.highThreshold,
-        lowThreshold = profile.lowThreshold,
+        minProminence = profile.minProminence,
+        thresholdK = profile.thresholdK,
         minRepIntervalMs = profile.minRepIntervalMs,
     )
     private val recentRepTimes = ArrayDeque<Long>()

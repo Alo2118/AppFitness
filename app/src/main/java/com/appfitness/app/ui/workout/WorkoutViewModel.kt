@@ -9,9 +9,12 @@ import com.appfitness.app.data.entity.SetLog
 import com.appfitness.app.data.relation.SessionWithSets
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -45,6 +48,18 @@ class WorkoutViewModel(
 
     private val _rest = MutableStateFlow(RestTimerState())
     val rest: StateFlow<RestTimerState> = _rest.asStateFlow()
+
+    /** The set to prepare for during rest (shown in the banner + announced). */
+    private val _nextUp = MutableStateFlow<SetLog?>(null)
+    val nextUp: StateFlow<SetLog?> = _nextUp.asStateFlow()
+
+    /** Emitted when the rest ends so the UI can auto-start the next set. */
+    private val _autoStart = MutableSharedFlow<SetLog>(extraBufferCapacity = 1)
+    val autoStart: SharedFlow<SetLog> = _autoStart.asSharedFlow()
+
+    /** Spoken cues driven by the screen-level coach (gated by the voice setting). */
+    private val _announce = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val announce: SharedFlow<String> = _announce.asSharedFlow()
 
     /** User's age (from the latest cardio test) for heart-rate zone calculations. */
     val userAge: StateFlow<Int> = repository.latestCardioAssessment
@@ -92,13 +107,66 @@ class WorkoutViewModel(
         viewModelScope.launch { repository.deleteSet(id) }
     }
 
-    /** Toggle a set's completed state; starts the rest timer when completing. */
+    /** Toggle a set's completed state; on completion, announce + rest + chain. */
     fun toggleCompleted(set: SetLog) {
         val updated = set.copy(completed = !set.completed)
         updateSet(updated)
-        if (updated.completed && updated.restSec > 0) {
-            startRest(updated.restSec)
+        if (updated.completed) onSetCompleted(set.id, set.restSec)
+    }
+
+    /** Marks a guided (rep) set complete with its real count, rewards, then chains. */
+    fun completeGuidedSet(set: SetLog, actualReps: Int) {
+        updateSet(set.copy(reps = actualReps, completed = true))
+        awardGuidedSet(actualReps, set.reps)
+        onSetCompleted(set.id, set.restSec)
+    }
+
+    /** Marks a time-based set complete, rewards, then chains. */
+    fun completeTimedSet(set: SetLog) {
+        updateSet(set.copy(completed = true))
+        viewModelScope.launch {
+            repository.addReward(
+                "timed",
+                com.appfitness.app.domain.ActivityRewardRules.timedSet(set.durationSec),
+            )
         }
+        onSetCompleted(set.id, set.restSec)
+    }
+
+    /**
+     * Sets in display order: grouped by exercise (first-seen order) then by set
+     * number — the same order the screen renders them in.
+     */
+    private fun orderedSets(): List<SetLog> =
+        session.value?.sets.orEmpty()
+            .groupBy { it.exerciseName }
+            .values
+            .flatMap { group -> group.sortedBy { it.setNumber } }
+
+    /** First not-yet-done set after the one just completed (excluded by id). */
+    private fun nextPendingAfter(completedId: Long): SetLog? =
+        orderedSets().firstOrNull { !it.completed && it.id != completedId }
+
+    /**
+     * Shared post-completion flow: work out what comes next, announce it so the
+     * user can get ready, then either run the rest timer (auto-starting the next
+     * set when it ends) or — if there's no rest — start the next set right away.
+     */
+    private fun onSetCompleted(completedId: Long, restSec: Int) {
+        val next = nextPendingAfter(completedId)
+        _nextUp.value = next
+        if (next != null) _announce.tryEmit("Prossimo: ${next.exerciseName}")
+        if (restSec > 0) {
+            startRest(restSec)
+        } else {
+            chainNext()
+        }
+    }
+
+    /** Auto-starts the prepared next set (after rest, or immediately if no rest). */
+    private fun chainNext() {
+        _nextUp.value?.let { _autoStart.tryEmit(it) }
+        _nextUp.value = null
     }
 
     fun startRest(seconds: Int) {
@@ -112,6 +180,7 @@ class WorkoutViewModel(
                 _rest.value = _rest.value.copy(remainingSec = remaining)
             }
             _rest.value = _rest.value.copy(isRunning = false)
+            chainNext()
         }
     }
 
@@ -125,9 +194,11 @@ class WorkoutViewModel(
         )
     }
 
+    /** Skips the rest and starts the next set immediately. */
     fun stopRest() {
         restJob?.cancel()
         _rest.value = RestTimerState()
+        chainNext()
     }
 
     /** Finalises the session with the post-workout emotional check-in. */

@@ -30,21 +30,27 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.appfitness.app.audio.SpeechCoach
 import com.appfitness.app.data.entity.SetLog
 import com.appfitness.app.domain.RepProfiles
 import com.appfitness.app.ui.AppViewModelProvider
+import com.appfitness.app.ui.components.rememberUserPreferences
 import com.appfitness.app.ui.exercises.ExerciseViewModel
 import com.appfitness.app.ui.guided.GuidedSetDialog
+import com.appfitness.app.ui.guided.GuidedTimedDialog
 import com.appfitness.app.ui.util.formatDuration
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,14 +63,28 @@ fun WorkoutScreen(
     val session by viewModel.session.collectAsStateWithLifecycle()
     val elapsed by viewModel.elapsedSec.collectAsStateWithLifecycle()
     val rest by viewModel.rest.collectAsStateWithLifecycle()
+    val nextUp by viewModel.nextUp.collectAsStateWithLifecycle()
     val exercises by exerciseViewModel.exercises.collectAsStateWithLifecycle()
     val userAge by viewModel.userAge.collectAsStateWithLifecycle()
+    val prefs = rememberUserPreferences()
 
     var showPicker by remember { mutableStateOf(false) }
     var showFinish by remember { mutableStateOf(false) }
-    var guidedSet by remember { mutableStateOf<SetLog?>(null) }
+    var activeSet by remember { mutableStateOf<SetLog?>(null) }
 
     val sets = session?.sets.orEmpty()
+
+    // Screen-level voice for announcing the next exercise during rest.
+    val context = LocalContext.current
+    val coach = remember { SpeechCoach(context) }
+    DisposableEffect(Unit) { onDispose { coach.shutdown() } }
+    LaunchedEffect(Unit) {
+        viewModel.announce.collect { phrase -> if (prefs.voiceCoach) coach.speak(phrase) }
+    }
+    // When the rest ends (or is skipped), auto-start the next set.
+    LaunchedEffect(Unit) {
+        viewModel.autoStart.collect { set -> activeSet = set }
+    }
 
     Scaffold(
         topBar = {
@@ -101,6 +121,7 @@ fun WorkoutScreen(
                 RestBanner(
                     remaining = rest.remainingSec,
                     progress = rest.progress,
+                    nextName = nextUp?.exerciseName,
                     onAdd = { viewModel.adjustRest(15) },
                     onSub = { viewModel.adjustRest(-15) },
                     onSkip = { viewModel.stopRest() },
@@ -130,7 +151,7 @@ fun WorkoutScreen(
                                 onUpdate = viewModel::updateSet,
                                 onToggle = viewModel::toggleCompleted,
                                 onDelete = viewModel::deleteSet,
-                                onGuided = { guidedSet = it },
+                                onGuided = { activeSet = it },
                             )
                         }
                     }
@@ -165,22 +186,34 @@ fun WorkoutScreen(
         )
     }
 
-    guidedSet?.let { set ->
+    activeSet?.let { set ->
         val exercise = exercises.firstOrNull { it.id == set.exerciseId }
-        GuidedSetDialog(
-            exerciseName = set.exerciseName,
-            targetReps = set.reps,
-            onDone = { actualReps ->
-                viewModel.updateSet(set.copy(reps = actualReps, completed = true))
-                viewModel.awardGuidedSet(actualReps, set.reps)
-                if (set.restSec > 0) viewModel.startRest(set.restSec)
-                guidedSet = null
-            },
-            onCancel = { guidedSet = null },
-            age = userAge,
-            repProfile = RepProfiles.forCategory(exercise?.category),
-            imageAsset = exercise?.imageAsset,
-        )
+        if (set.isTimeBased) {
+            GuidedTimedDialog(
+                exerciseName = set.exerciseName,
+                durationSec = set.durationSec,
+                onDone = {
+                    viewModel.completeTimedSet(set)
+                    activeSet = null
+                },
+                onCancel = { activeSet = null },
+                imageAsset = exercise?.imageAsset,
+                voiceEnabled = prefs.voiceCoach,
+            )
+        } else {
+            GuidedSetDialog(
+                exerciseName = set.exerciseName,
+                targetReps = set.reps,
+                onDone = { actualReps ->
+                    viewModel.completeGuidedSet(set, actualReps)
+                    activeSet = null
+                },
+                onCancel = { activeSet = null },
+                age = userAge,
+                repProfile = RepProfiles.forCategory(exercise?.category),
+                imageAsset = exercise?.imageAsset,
+            )
+        }
     }
 }
 
@@ -188,6 +221,7 @@ fun WorkoutScreen(
 private fun RestBanner(
     remaining: Int,
     progress: Float,
+    nextName: String?,
     onAdd: () -> Unit,
     onSub: () -> Unit,
     onSkip: () -> Unit,
@@ -206,6 +240,11 @@ private fun RestBanner(
                 text = formatDuration(remaining),
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = if (nextName != null) "Preparati: $nextName" else "Ultima serie 💪",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
             )
             LinearProgressIndicator(
                 progress = { progress },
@@ -299,10 +338,11 @@ private fun SetRow(
             }
         }
 
-        if (!set.isTimeBased) {
-            IconButton(onClick = onGuided) {
-                Icon(Icons.Filled.PlayCircle, contentDescription = "Modalità guidata")
-            }
+        IconButton(onClick = onGuided) {
+            Icon(
+                Icons.Filled.PlayCircle,
+                contentDescription = if (set.isTimeBased) "Avvia (a tempo)" else "Modalità guidata",
+            )
         }
         FilledIconButton(onClick = onToggle) {
             Icon(

@@ -97,8 +97,19 @@ del benessere olistico ma con un'esecuzione semplice e offline-first.
   battito alto) e ti spinge — *"Forza, ancora 2 ripetizioni!"* — fino a
   completare la serie, salvando il conteggio effettivo. Conteggio manuale di
   riserva se l'accelerometro non rileva.
+  - **Rilevamento ripetizioni a picchi con soglia adattiva**: una ripetizione è
+    contata solo su un **ciclo completo** (salita → picco prominente → discesa),
+    con soglia auto-calibrante sul rumore del segnale (`media + k·std`) e un
+    **pavimento di prominenza assoluto** che scarta i micro-movimenti — molto più
+    robusto del semplice superamento di una soglia fissa.
   - **Soglie adattive per esercizio**: il rilevatore di ripetizioni si calibra
     sul tipo di movimento (forza ampio/lento, core piccolo, cardio esplosivo).
+- **Sessione a flusso continuo** — ogni serie (a ripetizioni **o a tempo**) si
+  avvia con un tap; al completamento l'app **annuncia a voce il prossimo
+  esercizio** durante il recupero ("Preparati: …") e, **finita la pausa, avvia
+  automaticamente** la serie successiva. Gli esercizi **a tempo** (plank, ecc.)
+  hanno un countdown a schermo intero con anello di progresso e cue vocali
+  (via, metà, conto alla rovescia finale).
   - **Zone di frequenza cardiaca live**: mostra la zona corrente (Riposo →
     Massimale) rispetto alla zona target e **avvisa a voce** quando ne esci
     ("Aumenta il ritmo" / "Rallenta"), in base alla FCmax stimata dall'età.
